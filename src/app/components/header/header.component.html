@@ -3,32 +3,40 @@
     <div class="flex justify-between items-center h-20">
       <!-- Logo -->
       <a routerLink="/" class="flex-shrink-0 flex items-center gap-2 cursor-pointer group">
-        <img src="/assets/logos/logo.png" alt="Homely Logo" class="w-10 h-10 object-contain rounded-xl shadow-lg shadow-brand-blue/30 group-hover:scale-105 transition-transform duration-300">
-        <span class="font-bold text-xl text-brand-dark tracking-tight">Homely<span class="text-brand-blue">.</span></span>
+        <img src="/assets/logos/logo.png" alt="Homely Logo"
+          class="w-10 h-10 object-contain rounded-xl shadow-lg shadow-brand-blue/30 group-hover:scale-105 transition-transform duration-300">
+        <span class="font-bold text-xl text-brand-dark tracking-tight">Homely<span
+            class="text-brand-blue">.</span></span>
       </a>
-      
-      <!-- Desktop Nav -->
+
+      <!-- Navegación para escritorio -->
       <nav class="hidden md:flex space-x-8">
-        <a routerLink="/" routerLinkActive="text-brand-blue" [routerLinkActiveOptions]="{exact: true}" class="text-brand-dark font-medium hover:text-brand-blue transition-colors">Inicio</a>
-        <a routerLink="/propiedades" routerLinkActive="text-brand-blue" class="text-gray-500 font-medium hover:text-brand-blue transition-colors">Propiedades</a>
-        <a routerLink="/nosotros" routerLinkActive="text-brand-blue" class="text-gray-500 font-medium hover:text-brand-blue transition-colors">Sobre Nosotros</a>
-        <a routerLink="/contacto" routerLinkActive="text-brand-blue" class="text-gray-500 font-medium hover:text-brand-blue transition-colors">Contacto</a>
+        <a routerLink="/" routerLinkActive="text-brand-blue" [routerLinkActiveOptions]="{exact: true}"
+          class="text-brand-dark font-medium hover:text-brand-blue transition-colors">Inicio</a>
+        <a routerLink="/propiedades" routerLinkActive="text-brand-blue"
+          class="text-gray-500 font-medium hover:text-brand-blue transition-colors">Propiedades</a>
+        <a routerLink="/nosotros" routerLinkActive="text-brand-blue"
+          class="text-gray-500 font-medium hover:text-brand-blue transition-colors">Sobre Nosotros</a>
+        <a routerLink="/contacto" routerLinkActive="text-brand-blue"
+          class="text-gray-500 font-medium hover:text-brand-blue transition-colors">Contacto</a>
       </nav>
 
-      <!-- CTA -->
+      <!-- Botones de inicio de sesión y registro -->
       <div class="hidden md:flex items-center gap-4">
-        <a routerLink="/login" class="text-brand-dark font-medium hover:text-brand-blue transition-colors">Iniciar sesión</a>
-        <a routerLink="/registro" class="bg-gradient-brand hover:opacity-90 active:scale-95 transition-all text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-brand-blue/30 inline-block font-semibold">
+        <a routerLink="/login" class="text-brand-dark font-medium hover:text-brand-blue transition-colors">Iniciar
+          sesión</a>
+        <a routerLink="/registro"
+          class="bg-gradient-brand hover:opacity-90 active:scale-95 transition-all text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-brand-blue/30 inline-block font-semibold">
           Registrarse
         </a>
       </div>
 
-      <!-- Mobile menu button -->
+      <!-- Botones para móvil -->
       <div class="md:hidden flex items-center">
         <button class="text-gray-600 hover:text-brand-blue focus:outline-none transition-colors">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
         </button>
       </div>
     </div>
