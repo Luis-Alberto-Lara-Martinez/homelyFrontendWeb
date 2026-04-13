@@ -5,4 +5,4 @@ import { Component } from '@angular/core';
   standalone: true,
   templateUrl: './why-choose-us.component.html'
 })
-export class WhyChooseUsComponent {}
+export class WhyChooseUsComponent { }
