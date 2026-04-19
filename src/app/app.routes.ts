@@ -4,6 +4,7 @@ import { PropertiesComponent } from './pages/properties/properties.component';
 import { AboutComponent } from './pages/about/about.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { LoginComponent } from './pages/login/login.component';
+import { RegistroComponent } from './pages/registro/registro.component';
 
 export const routes: Routes = [
   {
@@ -30,6 +31,11 @@ export const routes: Routes = [
     path: 'login',
     component: LoginComponent,
     title: 'Homely - Iniciar Sesión'
+  },
+  {
+    path: 'registro',
+    component: RegistroComponent,
+    title: 'Homely - Crear Cuenta'
   },
   {
     path: '**',
