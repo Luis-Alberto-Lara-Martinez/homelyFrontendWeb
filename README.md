@@ -1,4 +1,13 @@
-# FrontWEB
+# FrontWEB (FrontEnd)
+
+Esta es la parte **FrontEnd** de la página WEB.
+
+### Miembros del Grupo:
+* Luis Alberto Lara Martinez
+* Samuel Ariza Solano
+* Alejandro Cabrera
+
+---
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.1.
 
