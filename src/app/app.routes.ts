@@ -3,6 +3,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { PropertiesComponent } from './pages/properties/properties.component';
 import { AboutComponent } from './pages/about/about.component';
 import { ContactComponent } from './pages/contact/contact.component';
+import { LoginComponent } from './pages/login/login.component';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,11 @@ export const routes: Routes = [
     path: 'contacto',
     component: ContactComponent,
     title: 'Homely - Contacto'
+  },
+  {
+    path: 'login',
+    component: LoginComponent,
+    title: 'Homely - Iniciar Sesión'
   },
   {
     path: '**',
