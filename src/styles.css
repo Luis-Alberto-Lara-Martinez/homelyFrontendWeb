@@ -1,14 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
 
+/* Definición de colores (theme lo detecta como desconocido porque es una definicion de Tailwing 4)*/
 @theme {
-  /* Brand colors imported from logo */
+
   --color-brand-blue: #4b7bf5;
   --color-brand-purple: #4b3a8c;
   --color-brand-light: #f0f4ff;
   --color-brand-dark: #2a2052;
-  
-  /* Primary mapped */
+
   --color-primary: var(--color-brand-blue);
   --color-primary-dark: var(--color-brand-purple);
 
@@ -24,14 +23,16 @@
   }
 }
 
-/* Custom utilities */
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+
   .bg-gradient-brand {
     background-image: linear-gradient(135deg, var(--color-brand-blue) 0%, var(--color-brand-purple) 100%);
   }
+
   .text-gradient-brand {
     background: linear-gradient(135deg, var(--color-brand-blue) 0%, var(--color-brand-purple) 100%);
     -webkit-background-clip: text;
@@ -39,4 +40,23 @@
     background-clip: text;
     color: transparent;
   }
+}
+
+/* Page Transition Animations (View Transitions API) */
+::view-transition-old(root) {
+  animation: custom-fade-out 0.25s ease-in-out forwards;
+}
+
+::view-transition-new(root) {
+  animation: custom-fade-in 0.25s ease-in-out forwards;
+}
+
+@keyframes custom-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes custom-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
