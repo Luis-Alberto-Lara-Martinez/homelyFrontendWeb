@@ -13,9 +13,9 @@ export const routes: Routes = [
     title: 'Homely - Encuentra tu hogar ideal'
   },
   {
-    path: 'propiedades',
+    path: 'comprar-alquilar',
     component: PropertiesComponent,
-    title: 'Homely - Propiedades'
+    title: 'Homely - Comprar/Alquilar'
   },
   {
     path: 'nosotros',
