@@ -6,8 +6,14 @@ import { ContactComponent } from './pages/contact/contact.component';
 import { LoginComponent } from './pages/login/login.component';
 import { RegistroComponent } from './pages/registro/registro.component';
 import { VentasComponent } from './pages/ventas/ventas.component';
+import { CalculadoraComponent } from './pages/calculadora/calculadora.component';
 
 export const routes: Routes = [
+  {
+    path: 'calculadora',
+    component: CalculadoraComponent,
+    title: 'Homely - Calculadora de Hipotecas'
+  },
   {
     path: 'vender',
     component: VentasComponent,

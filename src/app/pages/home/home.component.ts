@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { HeroComponent } from '../../components/hero/hero.component';
 import { StatsComponent } from '../../components/stats/stats.component';
 import { TestimonialsComponent } from '../../components/testimonials/testimonials.component';
+import { MortgageCtaComponent } from '../../components/mortgage-cta/mortgage-cta.component';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -10,7 +11,8 @@ import { environment } from '../../../environments/environment';
   imports: [
     HeroComponent,
     StatsComponent,
-    TestimonialsComponent
+    TestimonialsComponent,
+    MortgageCtaComponent
   ],
   templateUrl: './home.component.html'
 })
