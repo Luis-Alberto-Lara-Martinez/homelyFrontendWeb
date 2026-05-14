@@ -8,7 +8,7 @@ import { RegistroComponent } from './pages/registro/registro.component';
 
 export const routes: Routes = [
   {
-    path: '',
+    path: 'home',
     component: HomeComponent,
     title: 'Homely - Encuentra tu hogar ideal'
   },
@@ -38,7 +38,13 @@ export const routes: Routes = [
     title: 'Homely - Crear Cuenta'
   },
   {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
+  },
+  {
     path: '**',
-    redirectTo: ''
+    redirectTo: 'home',
+    pathMatch: 'full'
   }
 ];
