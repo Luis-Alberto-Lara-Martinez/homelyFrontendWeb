@@ -27,8 +27,7 @@
     <div
       class="bg-white py-10 px-6 shadow-2xl shadow-brand-blue/10 sm:rounded-3xl sm:px-12 border border-blue-50/50 transition-shadow hover:shadow-brand-blue/20 duration-500">
 
-      <form class="space-y-7" action="#" method="POST">
-
+      <form class="space-y-7" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
 
         <div>
           <label for="email" class="block text-sm font-bold text-gray-700 tracking-wide mb-2 uppercase">
@@ -36,7 +35,6 @@
           </label>
           <div class="mt-1 relative rounded-2xl shadow-sm group">
             <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-
               <svg class="h-6 w-6 text-gray-400 group-focus-within:text-brand-blue transition-colors duration-300"
                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
@@ -44,12 +42,16 @@
               </svg>
             </div>
 
-            <input id="email" name="email" type="email" autocomplete="email" required
+            <input id="email" formControlName="email" type="email" autocomplete="email" required
               class="appearance-none block w-full pl-14 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-0 focus:border-brand-blue text-base text-gray-900 placeholder-gray-400 bg-gray-50/50 focus:bg-white transition-all duration-300"
               placeholder="tu@email.com">
           </div>
+          <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
+            class="text-red-500 text-sm mt-1 font-medium">
+            <span *ngIf="loginForm.get('email')?.errors?.['required']">El correo es obligatorio.</span>
+            <span *ngIf="loginForm.get('email')?.errors?.['email']">Ingrese un correo válido.</span>
+          </div>
         </div>
-
 
         <div>
           <label for="password" class="block text-sm font-bold text-gray-700 tracking-wide mb-2 uppercase">
@@ -57,7 +59,6 @@
           </label>
           <div class="mt-1 relative rounded-2xl shadow-sm group">
             <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-
               <svg class="h-6 w-6 text-gray-400 group-focus-within:text-brand-blue transition-colors duration-300"
                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd"
@@ -66,12 +67,17 @@
               </svg>
             </div>
 
-            <input id="password" name="password" type="password" autocomplete="current-password" required
+            <input id="password" formControlName="password" type="password" autocomplete="current-password" required
               class="appearance-none block w-full pl-14 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-0 focus:border-brand-blue text-base text-gray-900 placeholder-gray-400 bg-gray-50/50 focus:bg-white transition-all duration-300"
               placeholder="••••••••">
           </div>
+          <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+            class="text-red-500 text-sm mt-1 font-medium">
+            <span *ngIf="loginForm.get('password')?.errors?.['required']">La contraseña es obligatoria.</span>
+            <span *ngIf="loginForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6
+              caracteres.</span>
+          </div>
         </div>
-
 
         <div class="flex items-center justify-end">
           <div class="text-sm">
@@ -81,12 +87,14 @@
           </div>
         </div>
 
+        <div *ngIf="errorMessage" class="text-red-500 text-center font-semibold text-sm">
+          {{ errorMessage }}
+        </div>
 
         <div class="pt-2">
-
-          <button type="submit"
-            class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-xl shadow-brand-blue/30 text-lg font-bold text-white bg-gradient-brand hover:opacity-95 hover:shadow-brand-blue/40 focus:outline-none transition-all duration-300 hover:-translate-y-1 active:scale-95 active:translate-y-0">
-            Iniciar Sesión
+          <button type="submit" [disabled]="isLoading"
+            class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-xl shadow-brand-blue/30 text-lg font-bold text-white bg-gradient-brand hover:opacity-95 hover:shadow-brand-blue/40 focus:outline-none transition-all duration-300 hover:-translate-y-1 active:scale-95 active:translate-y-0 disabled:opacity-50">
+            {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
           </button>
         </div>
       </form>

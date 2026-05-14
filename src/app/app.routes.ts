@@ -7,56 +7,65 @@ import { LoginComponent } from './pages/login/login.component';
 import { RegistroComponent } from './pages/registro/registro.component';
 import { VentasComponent } from './pages/ventas/ventas.component';
 import { CalculadoraComponent } from './pages/calculadora/calculadora.component';
+import { authGuard } from './guards/auth-guard'; // Importamos el Guard
 
 export const routes: Routes = [
   {
     path: 'calculadora',
     component: CalculadoraComponent,
+    canActivate: [authGuard], // ← ¡Protegida por el guard!
     title: 'Homely - Calculadora de Hipotecas'
   },
   {
     path: 'vender',
     component: VentasComponent,
+    canActivate: [authGuard], // ← Protegida
     title: 'Homely - Publica tu anuncio'
   },
   {
     path: 'home',
     component: HomeComponent,
+    canActivate: [authGuard], // ← Protegida
     title: 'Homely - Encuentra tu hogar ideal'
   },
   {
     path: 'comprar-alquilar',
     component: PropertiesComponent,
+    canActivate: [authGuard], // ← Protegida
     title: 'Homely - Comprar/Alquilar'
   },
   {
     path: 'nosotros',
     component: AboutComponent,
+    canActivate: [authGuard], // ← Protegida
     title: 'Homely - Sobre Nosotros'
   },
   {
     path: 'contacto',
     component: ContactComponent,
+    canActivate: [authGuard], // ← Protegida
     title: 'Homely - Contacto'
   },
   {
     path: 'login',
     component: LoginComponent,
     title: 'Homely - Iniciar Sesión'
+    // IMPORTANTE: Aquí NO ponemos canActivate, porque sino nadie podría entrar a loguearse
   },
   {
     path: 'registro',
     component: RegistroComponent,
     title: 'Homely - Crear Cuenta'
+    // IMPORTANTE: Aquí NO ponemos canActivate
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'login', // Al entrar a localhost:4200/ le mandamos a login
     pathMatch: 'full'
   },
   {
     path: '**',
-    redirectTo: 'home',
+    redirectTo: 'login', // Cualquier ruta rara manda al login
     pathMatch: 'full'
   }
 ];
