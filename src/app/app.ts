@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { AccessibilityWidgetComponent } from './components/accessibility-widget/accessibility-widget.component';
@@ -16,16 +16,22 @@ import { filter } from 'rxjs/operators';
 })
 export class App implements OnInit {
   isChatOpen = false;
-  showHeaderFooter = true;
+  showHeaderFooter = false; // Empezamos en false para evitar el parpadeo inicial
   private router = inject(Router);
+  private location = inject(Location);
 
   ngOnInit() {
+    const hiddenRoutes = ['/login', '/registro'];
+    
+    // 1. Comprobación síncrona INMEDIATA para la primera carga de la página
+    const initialPath = this.location.path().split('?')[0] || window.location.pathname;
+    this.showHeaderFooter = !hiddenRoutes.includes(initialPath) && initialPath !== '/'; 
+    // Nota: initialPath === '/' normalmente redirige a '/login', por eso también lo ocultamos.
+
+    // 2. Comprobación asíncrona para cuando el usuario navega por la app
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
-      // Rutas donde NO queremos que aparezca el Header y el Footer
-      const hiddenRoutes = ['/login', '/registro'];
-      // Comprobamos si la url actual está en la lista (ignorando parámetros como ?id=1)
       const currentUrl = event.urlAfterRedirects.split('?')[0];
       this.showHeaderFooter = !hiddenRoutes.includes(currentUrl);
     });
