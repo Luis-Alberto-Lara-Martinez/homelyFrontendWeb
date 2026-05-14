@@ -16,10 +16,4 @@ import { environment } from '../../../environments/environment';
   ],
   templateUrl: './home.component.html'
 })
-export class HomeComponent {
-
-  ngOnInit() {
-    console.log(environment.googleClientId);
-    console.log(environment.microsoftClientId);
-  }
-}
+export class HomeComponent { }
