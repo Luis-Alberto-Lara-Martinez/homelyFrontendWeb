@@ -1,0 +1,218 @@
+<section class="pt-32 pb-16 bg-gray-50 min-h-screen relative">
+  <!-- Background Elements -->
+  <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-light rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
+    <div class="absolute top-48 -left-24 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
+  </div>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    
+    <!-- Header -->
+    <div class="mb-8 text-center md:text-left">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-brand-dark mb-3">Publica tu anuncio</h1>
+      <p class="text-gray-600 text-lg">Vende o alquila tu inmueble de forma rápida y sencilla. Completa la información en 5 simples pasos.</p>
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-white rounded-3xl shadow-xl border border-gray-100/50 overflow-hidden backdrop-blur-sm bg-white/90">
+      <!-- Progress Bar Section -->
+      <div class="p-6 md:px-10 md:pt-8 md:pb-6 border-b border-gray-100 bg-gray-50/50">
+        <div class="text-sm font-bold text-gray-500 mb-3 flex items-center gap-2">
+          <span class="text-brand-blue px-2 py-1 bg-brand-blue/10 rounded-md">Paso {{currentStep}}/{{totalSteps}}</span> 
+          <span class="text-gray-800">{{getStepTitle()}}</span>
+        </div>
+        <div class="flex gap-2 h-2.5">
+          <!-- Step 1 -->
+          <div class="flex-1 rounded-full transition-all duration-500"
+               [ngClass]="currentStep >= 1 ? 'bg-brand-blue shadow-[0_0_8px_rgba(37,99,235,0.4)]' : 'bg-gray-200'"></div>
+          <!-- Step 2 -->
+          <div class="flex-1 rounded-full transition-all duration-500"
+               [ngClass]="currentStep >= 2 ? 'bg-brand-blue shadow-[0_0_8px_rgba(37,99,235,0.4)]' : 'bg-gray-200'"></div>
+          <!-- Step 3 -->
+          <div class="flex-1 rounded-full transition-all duration-500"
+               [ngClass]="currentStep >= 3 ? 'bg-brand-blue shadow-[0_0_8px_rgba(37,99,235,0.4)]' : 'bg-gray-200'"></div>
+          <!-- Step 4 -->
+          <div class="flex-1 rounded-full transition-all duration-500"
+               [ngClass]="currentStep >= 4 ? 'bg-brand-blue shadow-[0_0_8px_rgba(37,99,235,0.4)]' : 'bg-gray-200'"></div>
+          <!-- Step 5 -->
+          <div class="flex-1 rounded-full transition-all duration-500"
+               [ngClass]="currentStep >= 5 ? 'bg-brand-blue shadow-[0_0_8px_rgba(37,99,235,0.4)]' : 'bg-gray-200'"></div>
+        </div>
+      </div>
+
+      <!-- Form Content -->
+      <div class="p-6 md:p-10 min-h-[350px]">
+        <!-- Paso 1: Datos Básicos -->
+        <div *ngIf="currentStep === 1" class="animate-fade-in">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">¿Qué tipo de inmueble es?</h2>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <button *ngFor="let tipo of tiposVivienda"
+                    (click)="selectTipoVivienda(tipo.id)"
+                    class="flex flex-col items-center justify-center p-5 rounded-2xl border-2 transition-all duration-300 transform active:scale-95"
+                    [ngClass]="formData.tipoVivienda === tipo.id ? 'border-brand-blue bg-brand-blue/5 text-brand-blue shadow-md' : 'border-gray-100 hover:border-brand-blue/30 hover:bg-gray-50 text-gray-500'">
+              <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" [attr.d]="tipo.icon"></path>
+              </svg>
+              <span class="text-sm font-bold text-center">{{tipo.nombre}}</span>
+            </button>
+          </div>
+
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">¿Qué quieres hacer con el inmueble?</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <label class="relative flex items-center justify-center p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300"
+                   [ngClass]="formData.operacion === 'venta' ? 'border-brand-blue bg-brand-blue/5 shadow-md' : 'border-gray-100 hover:border-brand-blue/30 hover:bg-gray-50'">
+              <input type="radio" name="operacion" value="venta" [(ngModel)]="formData.operacion" class="sr-only">
+              <span class="font-bold text-lg" [ngClass]="formData.operacion === 'venta' ? 'text-brand-blue' : 'text-gray-600'">Vender</span>
+            </label>
+            <label class="relative flex items-center justify-center p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300"
+                   [ngClass]="formData.operacion === 'alquiler' ? 'border-brand-blue bg-brand-blue/5 shadow-md' : 'border-gray-100 hover:border-brand-blue/30 hover:bg-gray-50'">
+              <input type="radio" name="operacion" value="alquiler" [(ngModel)]="formData.operacion" class="sr-only">
+              <span class="font-bold text-lg" [ngClass]="formData.operacion === 'alquiler' ? 'text-brand-blue' : 'text-gray-600'">Alquilar</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Paso 2: Ubicación -->
+        <div *ngIf="currentStep === 2" class="animate-fade-in">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">¿Dónde se encuentra?</h2>
+          <div class="space-y-6">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Dirección completa</label>
+              <input type="text" [(ngModel)]="formData.direccion" placeholder="Ej: Calle Mayor 12, 3º B"
+                     class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-800 font-medium outline-none focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">Ciudad</label>
+                <input type="text" [(ngModel)]="formData.ciudad" placeholder="Ej: Madrid"
+                       class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-800 font-medium outline-none focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all">
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">Código Postal</label>
+                <input type="text" [(ngModel)]="formData.codigoPostal" placeholder="Ej: 28013"
+                       class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-800 font-medium outline-none focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 3: Características -->
+        <div *ngIf="currentStep === 3" class="animate-fade-in">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">Detalles del inmueble</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Habitaciones</label>
+              <input type="number" min="1" [(ngModel)]="formData.habitaciones"
+                     class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-800 font-bold outline-none focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all text-center">
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Baños</label>
+              <input type="number" min="1" [(ngModel)]="formData.banos"
+                     class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-800 font-bold outline-none focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all text-center">
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Metros útiles</label>
+              <div class="relative">
+                <input type="number" min="1" [(ngModel)]="formData.metros" placeholder="90"
+                       class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-800 font-bold outline-none focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all text-center pr-10">
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">m²</span>
+              </div>
+            </div>
+          </div>
+
+          <label class="block text-sm font-bold text-gray-700 mb-3">Extras (Opcional)</label>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <label class="flex flex-col items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300"
+                   [ngClass]="formData.extras.garaje ? 'border-brand-blue bg-brand-blue/5' : 'border-gray-100 hover:border-brand-blue/30 hover:bg-gray-50'">
+              <input type="checkbox" [(ngModel)]="formData.extras.garaje" class="sr-only">
+              <svg class="w-6 h-6 mb-2" [ngClass]="formData.extras.garaje ? 'text-brand-blue' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 17l.867 2.602c.163.488-.226.969-.738.969H4.871c-.512 0-.9-.481-.738-.969L5 17m14 0V9a2 2 0 00-2-2h-3m-4 0H7a2 2 0 00-2 2v8m14 0h-2m-10 0H5m4 0h6m-6-4h6m-6-4h6"></path></svg>
+              <span class="text-sm font-bold text-gray-700" [ngClass]="{'text-brand-blue': formData.extras.garaje}">Garaje</span>
+            </label>
+            <label class="flex flex-col items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300"
+                   [ngClass]="formData.extras.piscina ? 'border-brand-blue bg-brand-blue/5' : 'border-gray-100 hover:border-brand-blue/30 hover:bg-gray-50'">
+              <input type="checkbox" [(ngModel)]="formData.extras.piscina" class="sr-only">
+              <svg class="w-6 h-6 mb-2" [ngClass]="formData.extras.piscina ? 'text-brand-blue' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+              <span class="text-sm font-bold text-gray-700" [ngClass]="{'text-brand-blue': formData.extras.piscina}">Piscina</span>
+            </label>
+            <label class="flex flex-col items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300"
+                   [ngClass]="formData.extras.ascensor ? 'border-brand-blue bg-brand-blue/5' : 'border-gray-100 hover:border-brand-blue/30 hover:bg-gray-50'">
+              <input type="checkbox" [(ngModel)]="formData.extras.ascensor" class="sr-only">
+              <svg class="w-6 h-6 mb-2" [ngClass]="formData.extras.ascensor ? 'text-brand-blue' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+              <span class="text-sm font-bold text-gray-700" [ngClass]="{'text-brand-blue': formData.extras.ascensor}">Ascensor</span>
+            </label>
+            <label class="flex flex-col items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300"
+                   [ngClass]="formData.extras.terraza ? 'border-brand-blue bg-brand-blue/5' : 'border-gray-100 hover:border-brand-blue/30 hover:bg-gray-50'">
+              <input type="checkbox" [(ngModel)]="formData.extras.terraza" class="sr-only">
+              <svg class="w-6 h-6 mb-2" [ngClass]="formData.extras.terraza ? 'text-brand-blue' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              <span class="text-sm font-bold text-gray-700" [ngClass]="{'text-brand-blue': formData.extras.terraza}">Terraza</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Paso 4: Fotos -->
+        <div *ngIf="currentStep === 4" class="animate-fade-in">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">Sube las mejores fotos</h2>
+          <div class="border-2 border-dashed border-brand-blue/30 bg-brand-blue/5 rounded-3xl p-12 flex flex-col items-center justify-center text-center hover:bg-brand-blue/10 hover:border-brand-blue/50 transition-all cursor-pointer group">
+            <div class="w-20 h-20 bg-white text-brand-blue rounded-full flex items-center justify-center mb-5 shadow-sm group-hover:scale-110 transition-transform">
+              <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Añadir fotografías</h3>
+            <p class="text-gray-500 mb-6">Arrastra las imágenes o haz clic aquí</p>
+            <span class="bg-white border border-gray-200 text-gray-700 px-8 py-3 rounded-xl font-bold shadow-sm group-hover:shadow-md transition-all">
+              Explorar archivos
+            </span>
+            <p class="text-xs text-gray-400 mt-6 font-medium">JPG, PNG hasta 10MB</p>
+          </div>
+        </div>
+
+        <!-- Paso 5: Precio y Contacto -->
+        <div *ngIf="currentStep === 5" class="animate-fade-in">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">Precio y detalles finales</h2>
+          <div class="space-y-6">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Precio de {{formData.operacion}}</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-xl">€</span>
+                <input type="number" min="0" [(ngModel)]="formData.precio" placeholder="250000"
+                       class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-12 pr-4 py-4 text-brand-dark outline-none focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all font-bold text-2xl tracking-tight">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Descripción que enamore</label>
+              <textarea [(ngModel)]="formData.descripcion" rows="4" placeholder="Describe lo mejor de tu inmueble, la zona, luminosidad..."
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 font-medium outline-none focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all resize-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Teléfono de contacto</label>
+              <input type="tel" [(ngModel)]="formData.telefono" placeholder="+34 600 000 000"
+                     class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-800 font-medium outline-none focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Footer -->
+      <div class="p-6 md:px-10 md:py-8 border-t border-gray-100 bg-gray-50/50 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
+        <button (click)="prevStep()"
+                [class.invisible]="currentStep === 1"
+                class="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition-colors">
+          Volver atrás
+        </button>
+        
+        <button *ngIf="currentStep < totalSteps" (click)="nextStep()"
+                class="w-full sm:w-auto px-10 py-3.5 rounded-xl font-bold text-white bg-brand-blue hover:bg-brand-blue/90 shadow-lg shadow-brand-blue/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+          Continuar
+        </button>
+
+        <button *ngIf="currentStep === totalSteps"
+                class="w-full sm:w-auto px-10 py-3.5 rounded-xl font-bold text-white bg-gradient-brand hover:shadow-lg hover:shadow-brand-blue/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          Publicar Anuncio
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

@@ -5,8 +5,14 @@ import { AboutComponent } from './pages/about/about.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { LoginComponent } from './pages/login/login.component';
 import { RegistroComponent } from './pages/registro/registro.component';
+import { VentasComponent } from './pages/ventas/ventas.component';
 
 export const routes: Routes = [
+  {
+    path: 'vender',
+    component: VentasComponent,
+    title: 'Homely - Publica tu anuncio'
+  },
   {
     path: 'home',
     component: HomeComponent,
