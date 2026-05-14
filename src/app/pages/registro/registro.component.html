@@ -26,7 +26,7 @@
     <div
       class="bg-white py-10 px-6 shadow-2xl shadow-brand-blue/10 sm:rounded-3xl sm:px-12 border border-blue-50/50 transition-shadow hover:shadow-brand-blue/20 duration-500">
 
-      <form class="space-y-6" action="#" method="POST">
+      <form class="space-y-6" [formGroup]="registroForm" (ngSubmit)="onSubmit()">
 
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <!-- Input: Nombre -->
@@ -35,9 +35,12 @@
               Nombre
             </label>
             <div class="mt-1 relative rounded-2xl shadow-sm group">
-              <input id="nombre" name="nombre" type="text" autocomplete="given-name" required
+              <input id="nombre" formControlName="nombre" type="text" autocomplete="given-name"
                 class="appearance-none block w-full px-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-0 focus:border-brand-blue text-base text-gray-900 placeholder-gray-400 bg-gray-50/50 focus:bg-white transition-all duration-300"
                 placeholder="Tu nombre">
+            </div>
+            <div *ngIf="registroForm.get('nombre')?.touched && registroForm.get('nombre')?.invalid" class="text-red-500 text-sm mt-1 font-medium">
+              El nombre es obligatorio.
             </div>
           </div>
 
@@ -47,9 +50,12 @@
               Apellidos
             </label>
             <div class="mt-1 relative rounded-2xl shadow-sm group">
-              <input id="apellidos" name="apellidos" type="text" autocomplete="family-name" required
+              <input id="apellidos" formControlName="apellidos" type="text" autocomplete="family-name"
                 class="appearance-none block w-full px-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-0 focus:border-brand-blue text-base text-gray-900 placeholder-gray-400 bg-gray-50/50 focus:bg-white transition-all duration-300"
                 placeholder="Tus apellidos">
+            </div>
+            <div *ngIf="registroForm.get('apellidos')?.touched && registroForm.get('apellidos')?.invalid" class="text-red-500 text-sm mt-1 font-medium">
+              Los apellidos son obligatorios.
             </div>
           </div>
         </div>
@@ -68,9 +74,13 @@
                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
               </svg>
             </div>
-            <input id="email" name="email" type="email" autocomplete="email" required
+            <input id="email" formControlName="email" type="email" autocomplete="email"
               class="appearance-none block w-full pl-14 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-0 focus:border-brand-blue text-base text-gray-900 placeholder-gray-400 bg-gray-50/50 focus:bg-white transition-all duration-300"
               placeholder="tu@email.com">
+          </div>
+          <div *ngIf="registroForm.get('email')?.touched && registroForm.get('email')?.invalid" class="text-red-500 text-sm mt-1 font-medium">
+            <span *ngIf="registroForm.get('email')?.errors?.['required']">El correo es obligatorio.</span>
+            <span *ngIf="registroForm.get('email')?.errors?.['email']">Ingrese un correo válido.</span>
           </div>
         </div>
 
@@ -89,9 +99,13 @@
                   clip-rule="evenodd" />
               </svg>
             </div>
-            <input id="password" name="password" type="password" autocomplete="new-password" required
+            <input id="password" formControlName="password" type="password" autocomplete="new-password"
               class="appearance-none block w-full pl-14 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-0 focus:border-brand-blue text-base text-gray-900 placeholder-gray-400 bg-gray-50/50 focus:bg-white transition-all duration-300"
               placeholder="••••••••">
+          </div>
+          <div *ngIf="registroForm.get('password')?.touched && registroForm.get('password')?.invalid" class="text-red-500 text-sm mt-1 font-medium">
+            <span *ngIf="registroForm.get('password')?.errors?.['required']">La contraseña es obligatoria.</span>
+            <span *ngIf="registroForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres.</span>
           </div>
         </div>
 
@@ -110,18 +124,25 @@
                   clip-rule="evenodd" />
               </svg>
             </div>
-            <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password"
-              required
+            <input id="password_confirmation" formControlName="password_confirmation" type="password" autocomplete="new-password"
               class="appearance-none block w-full pl-14 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-0 focus:border-brand-blue text-base text-gray-900 placeholder-gray-400 bg-gray-50/50 focus:bg-white transition-all duration-300"
               placeholder="••••••••">
           </div>
+          <div *ngIf="registroForm.get('password_confirmation')?.touched && registroForm.get('password_confirmation')?.errors?.['passwordsMismatch']" class="text-red-500 text-sm mt-1 font-medium">
+            Las contraseñas no coinciden.
+          </div>
+        </div>
+
+        <!-- Mensaje de Error -->
+        <div *ngIf="errorMessage" class="text-red-500 text-center font-semibold text-sm">
+          {{ errorMessage }}
         </div>
 
         <!-- Botón de Envío -->
         <div class="pt-4">
-          <button type="submit"
-            class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-xl shadow-brand-blue/30 text-lg font-bold text-white bg-gradient-brand hover:opacity-95 hover:shadow-brand-blue/40 focus:outline-none transition-all duration-300 hover:-translate-y-1 active:scale-95 active:translate-y-0">
-            Registrarse
+          <button type="submit" [disabled]="isLoading"
+            class="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-xl shadow-brand-blue/30 text-lg font-bold text-white bg-gradient-brand hover:opacity-95 hover:shadow-brand-blue/40 focus:outline-none transition-all duration-300 hover:-translate-y-1 active:scale-95 active:translate-y-0 disabled:opacity-50">
+            {{ isLoading ? 'Registrando...' : 'Registrarse' }}
           </button>
         </div>
       </form>

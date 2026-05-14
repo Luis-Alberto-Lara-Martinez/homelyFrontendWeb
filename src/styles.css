@@ -70,3 +70,48 @@
     opacity: 1;
   }
 }
+
+/* ========================================================== */
+/* ACCESSIBILITY CLASSES */
+/* ========================================================== */
+
+/* Daltonismo / Color Blindness Filters */
+.acc-protanopia { filter: url(#protanopia-filter) !important; }
+.acc-deuteranopia { filter: url(#deuteranopia-filter) !important; }
+.acc-tritanopia { filter: url(#tritanopia-filter) !important; }
+.acc-achromatopsia { filter: grayscale(100%) !important; }
+
+/* Aumento de Texto / Large Text */
+.acc-large-text {
+  font-size: 115% !important; /* Aumenta el tamaño de fuente global */
+}
+.acc-large-text h1 { font-size: 3rem !important; }
+.acc-large-text h2 { font-size: 2.25rem !important; }
+.acc-large-text h3 { font-size: 1.75rem !important; }
+.acc-large-text p, .acc-large-text span, .acc-large-text a, .acc-large-text button, .acc-large-text input, .acc-large-text label {
+  font-size: 1.1em !important;
+}
+
+/* Alto Contraste / High Contrast */
+body.acc-high-contrast {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+body.acc-high-contrast * {
+  background-color: #000 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+  box-shadow: none !important;
+}
+body.acc-high-contrast img {
+  filter: contrast(150%) !important;
+}
+body.acc-high-contrast button {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 2px solid #fff !important;
+}
+body.acc-high-contrast a {
+  text-decoration: underline !important;
+  color: #fff !important;
+}

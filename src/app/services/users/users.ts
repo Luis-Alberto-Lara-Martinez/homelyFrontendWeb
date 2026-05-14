@@ -18,6 +18,11 @@ export class Users {
     return this.http.post<any>(`${environment.backendUrl}/auth/login`, credentials);
   }
 
+  // Registrar un nuevo usuario
+  register(userData: { nombre: string; apellidos: string; email: string; password: string }): Observable<any> {
+    return this.http.post<any>(`${environment.backendUrl}/auth/register`, userData);
+  }
+
   // 2. Añadimos método robusto para verificar si el usuario tiene sesión iniciada
   isAuthenticated(): boolean {
     try {
