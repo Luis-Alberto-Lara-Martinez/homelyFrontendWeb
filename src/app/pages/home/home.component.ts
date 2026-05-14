@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { HeroComponent } from '../../components/hero/hero.component';
 import { StatsComponent } from '../../components/stats/stats.component';
 import { TestimonialsComponent } from '../../components/testimonials/testimonials.component';
-import { environment } from '../../../enviroments/environment';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
