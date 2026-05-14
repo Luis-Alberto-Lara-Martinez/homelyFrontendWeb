@@ -1,6 +1,6 @@
 <div class="min-h-screen flex flex-col font-sans relative">
   <!-- Layout Header -->
-  <app-header></app-header>
+  <app-header *ngIf="showHeaderFooter"></app-header>
 
   <!-- Main Content Route -->
   <main class="flex-grow">
@@ -8,7 +8,7 @@
   </main>
 
   <!-- Layout Footer -->
-  <app-footer></app-footer>
+  <app-footer *ngIf="showHeaderFooter"></app-footer>
 
   <!-- Chatbot Window -->
   <div *ngIf="isChatOpen"
