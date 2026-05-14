@@ -112,29 +112,75 @@
 
 <!-- Modal del Mapa Interactivo -->
 <div *ngIf="showMapModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in">
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col animate-fade-in-up">
-    <!-- Header del modal -->
-    <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-      <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-        <svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
-        </svg>
-        Selecciona la ubicación
-      </h3>
-      <button (click)="closeMapModal()" class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
+  <!-- Desktop optimized modal: flex-row on md screens -->
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl h-[85vh] md:h-[70vh] flex flex-col md:flex-row overflow-hidden animate-fade-in-up relative">
     
-    <!-- Contenedor del mapa -->
-    <div class="relative w-full h-[60vh] min-h-[400px]">
+    <!-- Left panel: Controls -->
+    <div class="w-full md:w-1/3 md:min-w-[320px] bg-white flex flex-col h-full z-10 shadow-[10px_0_20px_rgba(0,0,0,0.05)]">
+      <!-- Header -->
+      <div class="px-6 py-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+        <h3 class="text-xl font-bold text-brand-dark leading-tight">
+          Selecciona tu <br><span class="text-brand-blue">ubicación ideal</span>
+        </h3>
+        <!-- Mobile close button -->
+        <button (click)="closeMapModal()" class="md:hidden text-gray-400 hover:text-red-500 bg-white shadow-sm p-2 rounded-full transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <!-- Scrollable content -->
+      <div class="p-6 flex-1 overflow-y-auto flex flex-col gap-8">
+        
+        <!-- Buscar ciudad -->
+        <div class="space-y-3">
+          <label class="font-bold text-gray-700 text-sm uppercase tracking-wide">Buscar ciudad o zona</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="searchCity()" placeholder="Ej: Madrid Centro"
+                   class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-11 pr-4 text-gray-800 font-medium outline-none focus:bg-white focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 transition-all">
+          </div>
+        </div>
+
+        <!-- Ubicación actual -->
+        <button (click)="useCurrentLocation()" class="w-full flex items-center justify-center gap-2 bg-brand-blue/5 text-brand-blue font-bold hover:bg-brand-blue/10 border border-brand-blue/10 transition-colors py-3.5 rounded-xl">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Utilizar mi ubicación actual
+        </button>
+
+        <!-- Distancia -->
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <label class="font-bold text-gray-700 text-sm uppercase tracking-wide">Radio de búsqueda</label>
+            <span class="font-bold text-brand-blue bg-brand-blue/10 px-3 py-1 rounded-lg">{{distance}} km</span>
+          </div>
+          <input type="range" min="1" max="50" step="1" [(ngModel)]="distance" (input)="updateCircle()"
+                 class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-blue">
+        </div>
+      </div>
+
+      <!-- Footer action -->
+      <div class="p-6 border-t border-gray-100 bg-gray-50">
+        <button (click)="applyLocation()" class="w-full bg-gradient-brand text-white font-bold py-4 rounded-xl hover:shadow-lg hover:shadow-brand-blue/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+          Aplicar ubicación
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Right panel: Map -->
+    <div class="w-full md:w-2/3 h-64 md:h-full relative bg-gray-100 flex-shrink-0 md:flex-shrink">
+      <!-- Desktop close button -->
+      <button (click)="closeMapModal()" class="hidden md:flex absolute top-4 right-4 z-[1000] bg-white text-gray-500 hover:text-red-500 shadow-md p-2 rounded-full transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+      
       <div id="map-container" class="absolute inset-0 w-full h-full z-0"></div>
       
-      <!-- Overlay de instrucciones -->
-      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-white/20 text-sm font-medium text-gray-700 pointer-events-none whitespace-nowrap">
-        Haz clic en el mapa para establecer la ubicación
+      <!-- Overlay helper text on map -->
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-white/20 text-sm font-bold text-gray-700 pointer-events-none whitespace-nowrap">
+        Haz clic en el mapa para marcar el centro
       </div>
     </div>
   </div>

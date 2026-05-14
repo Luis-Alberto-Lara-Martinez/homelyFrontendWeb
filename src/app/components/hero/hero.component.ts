@@ -17,13 +17,17 @@ export class HeroComponent {
   private map: any;
   private marker: any;
 
+  distance: number = 2;
+  searchQuery: string = '';
+  tempLocationData: any = null;
+  private circle: any;
+
   constructor(private cdr: ChangeDetectorRef) {}
 
   openMapModal() {
     this.showMapModal = true;
     setTimeout(() => {
       this.initMap();
-      // Refrescar tamaño del mapa después de la animación del modal
       setTimeout(() => {
         if (this.map) {
           this.map.invalidateSize();
@@ -39,19 +43,34 @@ export class HeroComponent {
       this.map = null;
     }
     this.marker = null;
-    this.cdr.detectChanges(); // Forzar actualización de la vista
+    this.circle = null;
+    this.cdr.detectChanges();
   }
 
   initMap() {
     if (this.map) return;
 
-    this.map = L.map('map-container').setView([40.4168, -3.7038], 6);
+    // Madrid center as default location
+    this.map = L.map('map-container').setView([40.4168, -3.7038], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
 
-    // Icono personalizado para evitar errores 404 de Angular
+    this.map.on('click', (e: any) => {
+      this.setMarkerAndCircle(e.latlng.lat, e.latlng.lng);
+      this.reverseGeocode(e.latlng.lat, e.latlng.lng);
+    });
+  }
+
+  setMarkerAndCircle(lat: number, lng: number) {
+    if (this.marker) {
+      this.map.removeLayer(this.marker);
+    }
+    if (this.circle) {
+      this.map.removeLayer(this.circle);
+    }
+
     const customIcon = L.icon({
       iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
       iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -62,13 +81,24 @@ export class HeroComponent {
       shadowSize: [41, 41]
     });
 
-    this.map.on('click', (e: any) => {
-      if (this.marker) {
-        this.map.removeLayer(this.marker);
-      }
-      this.marker = L.marker([e.latlng.lat, e.latlng.lng], { icon: customIcon }).addTo(this.map);
-      this.reverseGeocode(e.latlng.lat, e.latlng.lng);
-    });
+    this.marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
+    
+    // Draw circle with brand colors
+    this.circle = L.circle([lat, lng], {
+      color: '#2563EB', // blue-600
+      fillColor: '#3B82F6', // blue-500
+      fillOpacity: 0.15,
+      weight: 2,
+      radius: this.distance * 1000
+    }).addTo(this.map);
+
+    this.map.setView([lat, lng], 13);
+  }
+
+  updateCircle() {
+    if (this.circle && this.marker) {
+      this.circle.setRadius(this.distance * 1000);
+    }
   }
 
   async reverseGeocode(lat: number, lon: number) {
@@ -81,25 +111,63 @@ export class HeroComponent {
         const state = data.address.state || data.address.region;
 
         if (city && state) {
-          this.location = `${city}, ${state}`;
+          this.tempLocationData = `${city}, ${state}`;
         } else if (city) {
-          this.location = city;
+          this.tempLocationData = city;
         } else if (state) {
-          this.location = state;
+          this.tempLocationData = state;
         } else if (data.display_name) {
-          this.location = data.display_name.split(',')[0];
+          this.tempLocationData = data.display_name.split(',')[0];
         }
       } else {
-        this.location = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+        this.tempLocationData = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
       }
     } catch (error) {
       console.error('Error reverse geocoding:', error);
-      this.location = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-    } finally {
-      // Siempre cerrar el modal después de seleccionar una ubicación, con un pequeño retraso
-      setTimeout(() => {
-        this.closeMapModal();
-      }, 500); 
+      this.tempLocationData = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
     }
+    this.cdr.detectChanges();
+  }
+
+  async searchCity() {
+    if (!this.searchQuery) return;
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.searchQuery)}&limit=1`);
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        this.setMarkerAndCircle(lat, lon);
+        this.reverseGeocode(lat, lon);
+      }
+    } catch (err) {
+      console.error('Error searching city:', err);
+    }
+  }
+
+  useCurrentLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          this.setMarkerAndCircle(lat, lon);
+          this.reverseGeocode(lat, lon);
+        },
+        (error) => {
+          console.error('Error obtaining location', error);
+          alert('No se ha podido acceder a la ubicación. Revisa los permisos del navegador.');
+        }
+      );
+    } else {
+      alert('Tu navegador no soporta geolocalización.');
+    }
+  }
+
+  applyLocation() {
+    if (this.tempLocationData) {
+      this.location = this.tempLocationData;
+    }
+    this.closeMapModal();
   }
 }
