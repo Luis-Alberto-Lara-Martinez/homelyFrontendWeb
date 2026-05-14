@@ -25,17 +25,16 @@
 
       <!-- Botones de inicio de sesión y registro -->
       <div class="hidden lg:flex items-center gap-4">
-        <a routerLink="/login" class="text-brand-dark font-medium hover:text-brand-blue transition-colors">Iniciar
-          sesión</a>
-        <a routerLink="/registro"
+        <a routerLink="/login"
           class="bg-gradient-brand hover:opacity-90 active:scale-95 transition-all text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-brand-blue/30 inline-block font-semibold">
-          Registrarse
+          Inicio Sesión
         </a>
       </div>
 
       <!-- Botones para móvil -->
       <div class="lg:hidden flex items-center">
-        <button (click)="toggleMenu()" type="button" class="text-gray-600 hover:text-brand-blue focus:outline-none transition-colors" aria-label="Abrir menú">
+        <button (click)="toggleMenu()" type="button"
+          class="text-gray-600 hover:text-brand-blue focus:outline-none transition-colors" aria-label="Abrir menú">
           <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
@@ -46,20 +45,27 @@
     <div *ngIf="menuOpen" class="lg:hidden">
       <nav class="px-4 pb-4 space-y-2 bg-white border-t border-gray-200">
         <a routerLink="/" routerLinkActive="text-brand-blue" [routerLinkActiveOptions]="{exact: true}"
-          class="block text-brand-dark font-medium hover:text-brand-blue transition-colors" (click)="closeMenu()">Inicio</a>
+          class="block text-brand-dark font-medium hover:text-brand-blue transition-colors"
+          (click)="closeMenu()">Inicio</a>
         <a routerLink="/comprar-alquilar" routerLinkActive="text-brand-blue"
-          class="block text-gray-500 font-medium hover:text-brand-blue transition-colors whitespace-nowrap" (click)="closeMenu()">Comprar/Alquilar</a>
+          class="block text-gray-500 font-medium hover:text-brand-blue transition-colors whitespace-nowrap"
+          (click)="closeMenu()">Comprar/Alquilar</a>
         <a routerLink="/vender" routerLinkActive="text-brand-blue"
-          class="block text-gray-500 font-medium hover:text-brand-blue transition-colors" (click)="closeMenu()">Vender</a>
+          class="block text-gray-500 font-medium hover:text-brand-blue transition-colors"
+          (click)="closeMenu()">Vender</a>
         <a routerLink="/nosotros" routerLinkActive="text-brand-blue"
-          class="block text-gray-500 font-medium hover:text-brand-blue transition-colors whitespace-nowrap" (click)="closeMenu()">Sobre Nosotros</a>
+          class="block text-gray-500 font-medium hover:text-brand-blue transition-colors whitespace-nowrap"
+          (click)="closeMenu()">Sobre Nosotros</a>
         <a routerLink="/contacto" routerLinkActive="text-brand-blue"
-          class="block text-gray-500 font-medium hover:text-brand-blue transition-colors" (click)="closeMenu()">Contacto</a>
+          class="block text-gray-500 font-medium hover:text-brand-blue transition-colors"
+          (click)="closeMenu()">Contacto</a>
 
         <div class="pt-3 border-t border-gray-200 flex flex-col gap-2">
-          <a routerLink="/login" class="block text-brand-dark font-medium hover:text-brand-blue transition-colors" (click)="closeMenu()">Iniciar sesión</a>
+          <a routerLink="/login" class="block text-brand-dark font-medium hover:text-brand-blue transition-colors"
+            (click)="closeMenu()">Iniciar sesión</a>
           <a routerLink="/registro"
-            class="block bg-gradient-brand hover:opacity-90 active:scale-95 transition-all text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-brand-blue/30 font-semibold text-center" (click)="closeMenu()">Registrarse</a>
+            class="block bg-gradient-brand hover:opacity-90 active:scale-95 transition-all text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-brand-blue/30 font-semibold text-center"
+            (click)="closeMenu()">Registrarse</a>
         </div>
       </nav>
     </div>
