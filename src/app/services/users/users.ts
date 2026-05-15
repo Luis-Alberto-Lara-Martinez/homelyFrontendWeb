@@ -9,18 +9,18 @@ import { environment } from '../../../environments/environment';
 })
 export class Users {
   // Usamos el entorno para que coja http://localhost:8080/api/user
-  private baseUrl = environment.backendUrl + '/api/user'; 
+  private baseUrl = environment.backendUrl + '/api/user';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // 1. Añadimos método para Iniciar Sesión usando la ruta del backend
   login(credentials: { email: string; password: string }): Observable<any> {
-    return this.http.post<any>(`${environment.backendUrl}/auth/login`, credentials);
+    return this.http.post<any>(`${environment.backendUrl}/local/login`, credentials);
   }
 
   // Registrar un nuevo usuario
   register(userData: { nombre: string; apellidos: string; email: string; password: string }): Observable<any> {
-    return this.http.post<any>(`${environment.backendUrl}/auth/register`, userData);
+    return this.http.post<any>(`${environment.backendUrl}/local/register`, userData);
   }
 
   // 2. Añadimos método robusto para verificar si el usuario tiene sesión iniciada
