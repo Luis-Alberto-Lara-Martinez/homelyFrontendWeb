@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const environmentProdTs = `export const environment = {
     production: true,
-    backendUrl: "https://servidorhomely.app/",
+    backendUrl: "https://servidorhomely.app",
     googleClientId: '${process.env.GOOGLE_CLIENT_ID}',
     microsoftClientId: '${process.env.MICROSOFT_CLIENT_ID}'
 };
