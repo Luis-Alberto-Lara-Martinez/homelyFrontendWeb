@@ -8,8 +8,15 @@ import { RegistroComponent } from './pages/registro/registro.component';
 import { VentasComponent } from './pages/ventas/ventas.component';
 import { CalculadoraComponent } from './pages/calculadora/calculadora.component';
 import { authGuard } from './guards/auth-guard'; // Importamos el Guard
+import { ProfileComponent } from './pages/profile/profile.component';
 
 export const routes: Routes = [
+  {
+    path: 'mi-cuenta',
+    component: ProfileComponent,
+    canActivate: [authGuard],
+    title: 'Homely - Mi Cuenta'
+  },
   {
     path: 'calculadora',
     component: CalculadoraComponent,

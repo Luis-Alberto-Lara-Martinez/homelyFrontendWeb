@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.valid) {
       this.isLoading = true;
       this.errorMessage = '';
-      
+
       this.usersService.login(this.loginForm.value).subscribe({
         next: (response) => {
           console.log('Respuesta del backend:', response);

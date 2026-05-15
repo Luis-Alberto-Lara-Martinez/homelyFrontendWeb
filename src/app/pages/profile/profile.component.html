@@ -1,0 +1,127 @@
+<div class="min-h-screen bg-gray-50 pt-28 pb-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header Perfil -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-brand-dark">Mi Cuenta</h1>
+            <p class="text-gray-500 mt-1">Gestiona tu información personal y preferencias.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Sidebar / Card lateral -->
+            <div class="md:col-span-1">
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-gradient-brand h-24"></div>
+                    <div class="px-6 pb-6 text-center -mt-12">
+                        <div class="relative inline-block">
+                            <img [src]="user?.avatar || '/assets/img/default-avatar.png'"
+                                class="w-24 h-24 rounded-2xl object-cover border-4 border-white shadow-lg mx-auto bg-gray-200">
+                            <button
+                                class="absolute bottom-0 right-0 bg-white p-2 rounded-xl shadow-md border border-gray-100 text-brand-blue hover:text-brand-dark transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <h2 class="mt-4 text-xl font-bold text-brand-dark">{{user?.nombre}} {{user?.apellidos}}</h2>
+                        <p class="text-sm text-gray-500">{{user?.email}}</p>
+
+                        <div class="mt-6 pt-6 border-t border-gray-100 space-y-2">
+                            <button
+                                class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium bg-brand-blue/5 text-brand-blue border border-brand-blue/10">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                Perfil Público
+                            </button>
+                            <button
+                                class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                                Notificaciones
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos principales -->
+            <div class="md:col-span-2 space-y-6">
+                <!-- Info Personal -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-brand-dark flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0V5" />
+                            </svg>
+                            Información Personal
+                        </h3>
+                        <button class="text-sm font-semibold text-brand-blue hover:underline">Editar</button>
+                    </div>
+
+                    <div *ngIf="isLoading" class="flex justify-center py-8">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue"></div>
+                    </div>
+
+                    <div *ngIf="!isLoading && user" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Nombre</label>
+                            <p class="mt-1 font-medium text-brand-dark">{{user?.nombre}}</p>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Apellidos</label>
+                            <p class="mt-1 font-medium text-brand-dark">{{user?.apellidos}}</p>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Correo
+                                Electrónico</label>
+                            <p class="mt-1 font-medium text-brand-dark">{{user?.email}}</p>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Teléfono</label>
+                            <p class="mt-1 font-medium text-brand-dark">{{user?.telefono || 'No especificado'}}</p>
+                        </div>
+                    </div>
+
+                    <div *ngIf="errorMessage" class="bg-red-50 text-red-600 p-4 rounded-2xl text-sm">
+                        {{errorMessage}}
+                    </div>
+                </div>
+
+                <!-- Seguridad -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <h3 class="text-lg font-bold text-brand-dark flex items-center gap-2 mb-6">
+                        <svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Seguridad
+                    </h3>
+                    <div class="flex items-center justify-between py-4 border-b border-gray-50">
+                        <div>
+                            <p class="font-medium text-brand-dark">Contraseña</p>
+                            <p class="text-sm text-gray-500">Actualiza tu contraseña regularmente para mayor seguridad.
+                            </p>
+                        </div>
+                        <button
+                            class="px-4 py-2 text-sm font-bold text-brand-blue hover:bg-brand-blue/5 rounded-xl transition-colors">Cambiar</button>
+                    </div>
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <p class="font-medium text-brand-dark">Verificación en dos pasos</p>
+                            <p class="text-sm text-gray-500">Añade una capa extra de protección a tu cuenta.</p>
+                        </div>
+                        <button
+                            class="px-4 py-2 text-sm font-bold text-gray-400 cursor-not-allowed">Desactivado</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
