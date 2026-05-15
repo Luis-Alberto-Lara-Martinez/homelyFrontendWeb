@@ -14,6 +14,7 @@ import {environment} from '../../../environments/environment';
 export class LoginComponent implements OnInit {
 
   private readonly googleClientId: string = environment.googleClientId;
+  private readonly microsoftClientId: string = environment.microsoftClientId;
 
   loginForm: FormGroup;
   errorMessage: string = '';
@@ -76,6 +77,30 @@ export class LoginComponent implements OnInit {
         `&scope=${encodeURIComponent(scope)}` +
         `&state=${state}` +
         `&nonce=${nonce}` +
+        `&prompt=select_account`;
+    } catch (error) {
+      console.error('❌ Error en signIn:', error);
+      throw error;
+    }
+  }
+
+  async signInWithMicrosoft(): Promise<void> {
+    try {
+      const state = this.generateRandomString(32);
+      const nonce = this.generateRandomString(32);
+
+      sessionStorage.setItem('oauth_state', state);
+      sessionStorage.setItem('oauth_nonce', nonce);
+
+      const scope = 'openid profile email';
+      window.location.href = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?` +
+        `client_id=${this.microsoftClientId}` +
+        `&redirect_uri=${encodeURIComponent(window.location.origin + window.location.pathname)}` +
+        `&response_type=token id_token` +
+        `&scope=${encodeURIComponent(scope)}` +
+        `&state=${state}` +
+        `&nonce=${nonce}` +
+        `&response_mode=fragment` +
         `&prompt=select_account`;
     } catch (error) {
       console.error('❌ Error en signIn:', error);
