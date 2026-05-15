@@ -11,8 +11,13 @@ import { Users } from '../../services/users/users';
 })
 export class HeaderComponent {
   menuOpen = false;
+  dropdownOpen = false;
 
   constructor(public usersService: Users, private router: Router) { }
+
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
 
   logout() {
     localStorage.removeItem('token');
