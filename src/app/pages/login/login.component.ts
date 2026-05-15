@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Users } from '../../services/users/users';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {Router, RouterLink} from '@angular/router';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Users} from '../../services/users/users';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -11,6 +12,9 @@ import { Users } from '../../services/users/users';
   templateUrl: './login.component.html'
 })
 export class LoginComponent implements OnInit {
+
+  private readonly googleClientId: string = environment.googleClientId;
+
   loginForm: FormGroup;
   errorMessage: string = '';
   isLoading: boolean = false;
@@ -27,10 +31,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Si ya está logueado, no le dejamos estar en el login
-    if (this.usersService.isAuthenticated()) {
-      this.router.navigate(['/home']);
-    }
+    this.handleRedirectCallback();
   }
 
   onSubmit() {
@@ -57,5 +58,63 @@ export class LoginComponent implements OnInit {
     } else {
       this.loginForm.markAllAsTouched();
     }
+  }
+
+  async signInWithGoogle(): Promise<void> {
+    try {
+      const state = this.generateRandomString(32);
+      const nonce = this.generateRandomString(32);
+
+      sessionStorage.setItem('oauth_state', state);
+      sessionStorage.setItem('oauth_nonce', nonce);
+
+      const scope = 'openid email profile';
+      window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?` +
+        `client_id=${this.googleClientId}` +
+        `&redirect_uri=${encodeURIComponent(window.location.origin + window.location.pathname)}` +
+        `&response_type=token id_token` +
+        `&scope=${encodeURIComponent(scope)}` +
+        `&state=${state}` +
+        `&nonce=${nonce}` +
+        `&prompt=select_account`;
+    } catch (error) {
+      console.error('❌ Error en signIn:', error);
+      throw error;
+    }
+  }
+
+  private handleRedirectCallback(): void {
+    const hash = window.location.hash;
+
+    if (hash.includes('id_token')) {
+      const params = new URLSearchParams(hash.substring(1));
+      const idToken = params.get('id_token');
+
+      if (idToken) {
+        this.usersService.oauth2login(idToken).subscribe({
+          next: (response) => {
+            if (response && response.token) {
+              localStorage.setItem('token', response.token);
+              window.history.replaceState(null, '', window.location.pathname);
+              this.router.navigate(['/home']);
+            }
+          },
+          error: (err) => {
+            this.errorMessage = err.error;
+          }
+        });
+      }
+    }
+  }
+
+  private generateRandomString(length: number): string {
+    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const values = new Uint8Array(length);
+    crypto.getRandomValues(values);
+    for (let i = 0; i < length; i++) {
+      result += charset[values[i] % charset.length];
+    }
+    return result;
   }
 }

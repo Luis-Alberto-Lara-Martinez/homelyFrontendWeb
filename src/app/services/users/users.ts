@@ -1,8 +1,8 @@
 // users.service.ts (Ejemplo en Angular)
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {environment} from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +11,21 @@ export class Users {
   // Usamos el entorno para que coja http://localhost:8080/api/user
   private baseUrl = environment.backendUrl + '/api/user';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   // 1. Añadimos método para Iniciar Sesión usando la ruta del backend
   login(credentials: { email: string; password: string }): Observable<any> {
     return this.http.post<any>(`${environment.backendUrl}/local/login`, credentials);
+  }
+
+  oauth2login(idToken: string): Observable<any> {
+    const headers: HttpHeaders = new HttpHeaders().set('Authorization', `Bearer ${idToken}`);
+    return this.http.post<any>(
+      `${environment.backendUrl}/oauth2/login`,
+      {},
+      {headers}
+    );
   }
 
   // Registrar un nuevo usuario
@@ -39,27 +49,27 @@ export class Users {
   getUserProfile(): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any>(`${this.baseUrl}/profile`, { headers });
+    return this.http.get<any>(`${this.baseUrl}/profile`, {headers});
   }
 
   // Actualizar perfil (PUT /api/user/profile, con avatar opcional)
   updateUserProfile(profileData: FormData): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.put<any>(`${this.baseUrl}/profile`, profileData, { headers });
+    return this.http.put<any>(`${this.baseUrl}/profile`, profileData, {headers});
   }
 
   // Cambiar contraseña (PUT /api/user/password)
   updateUserPassword(passwordData: { oldPassword: string; newPassword: string }): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.put<any>(`${this.baseUrl}/password`, passwordData, { headers });
+    return this.http.put<any>(`${this.baseUrl}/password`, passwordData, {headers});
   }
 
   // Obtener todos los usuarios (para admin, GET /admin/users - si está habilitado)
   getAllUsers(): Observable<any[]> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any[]>(`${this.baseUrl}/admin/users`, { headers });
+    return this.http.get<any[]>(`${this.baseUrl}/admin/users`, {headers});
   }
 }
