@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -10,7 +10,7 @@ import { Users } from '../../services/users/users';
   imports: [CommonModule, RouterLink, ReactiveFormsModule],
   templateUrl: './login.component.html'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   errorMessage: string = '';
   isLoading: boolean = false;
@@ -26,6 +26,13 @@ export class LoginComponent {
     });
   }
 
+  ngOnInit() {
+    // Si ya está logueado, no le dejamos estar en el login
+    if (this.usersService.isAuthenticated()) {
+      this.router.navigate(['/home']);
+    }
+  }
+
   onSubmit() {
     if (this.loginForm.valid) {
       this.isLoading = true;
@@ -33,11 +40,14 @@ export class LoginComponent {
       
       this.usersService.login(this.loginForm.value).subscribe({
         next: (response) => {
+          console.log('Respuesta del backend:', response);
           if (response && response.token) {
             localStorage.setItem('token', response.token);
+            this.router.navigate(['/home']);
+          } else {
+            this.isLoading = false;
+            this.errorMessage = 'El servidor no devolvió un token válido. Contacte con soporte.';
           }
-          // Si el login es exitoso vamos a la página web (al /home)
-          this.router.navigate(['/home']);
         },
         error: (err) => {
           this.isLoading = false;

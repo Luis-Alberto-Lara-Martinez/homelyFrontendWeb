@@ -25,10 +25,18 @@
 
       <!-- Botones de inicio de sesión y registro -->
       <div class="hidden lg:flex items-center gap-4">
-        <a routerLink="/login"
-          class="bg-gradient-brand hover:opacity-90 active:scale-95 transition-all text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-brand-blue/30 inline-block font-semibold">
-          Inicio Sesión
-        </a>
+        <ng-container *ngIf="!usersService.isAuthenticated()">
+          <a routerLink="/login"
+            class="bg-gradient-brand hover:opacity-90 active:scale-95 transition-all text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-brand-blue/30 inline-block font-semibold">
+            Inicio Sesión
+          </a>
+        </ng-container>
+        <ng-container *ngIf="usersService.isAuthenticated()">
+          <button (click)="logout()"
+            class="bg-red-500 hover:bg-red-600 active:scale-95 transition-all text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-red-200 inline-block font-semibold">
+            Cerrar Sesión
+          </button>
+        </ng-container>
       </div>
 
       <!-- Botones para móvil -->
@@ -61,11 +69,19 @@
           (click)="closeMenu()">Contacto</a>
 
         <div class="pt-3 border-t border-gray-200 flex flex-col gap-2">
-          <a routerLink="/login" class="block text-brand-dark font-medium hover:text-brand-blue transition-colors"
-            (click)="closeMenu()">Iniciar sesión</a>
-          <a routerLink="/registro"
-            class="block bg-gradient-brand hover:opacity-90 active:scale-95 transition-all text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-brand-blue/30 font-semibold text-center"
-            (click)="closeMenu()">Registrarse</a>
+          <ng-container *ngIf="!usersService.isAuthenticated()">
+            <a routerLink="/login" class="block text-brand-dark font-medium hover:text-brand-blue transition-colors"
+              (click)="closeMenu()">Iniciar sesión</a>
+            <a routerLink="/registro"
+              class="block bg-gradient-brand hover:opacity-90 active:scale-95 transition-all text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-brand-blue/30 font-semibold text-center"
+              (click)="closeMenu()">Registrarse</a>
+          </ng-container>
+          <ng-container *ngIf="usersService.isAuthenticated()">
+            <button (click)="logout()"
+              class="block bg-red-500 hover:bg-red-600 active:scale-95 transition-all text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-red-200 font-semibold text-center">
+              Cerrar Sesión
+            </button>
+          </ng-container>
         </div>
       </nav>
     </div>

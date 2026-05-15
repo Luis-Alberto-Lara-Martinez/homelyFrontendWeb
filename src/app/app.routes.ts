@@ -60,7 +60,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'login', // Al entrar a localhost:4200/ le mandamos a login
+    redirectTo: 'home', // Al entrar a la raíz, redirigimos a home (que está protegida)
     pathMatch: 'full'
   },
   {
