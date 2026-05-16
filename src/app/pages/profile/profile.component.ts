@@ -226,7 +226,18 @@ export class ProfileComponent implements OnInit {
         error: (err) => {
           this.zone.run(() => {
             console.error('Error al actualizar perfil:', err);
-            const errorMsg = err.error?.message || 'No se pudo actualizar el perfil.';
+            
+            // Intentamos sacar el mensaje del error del servidor
+            let errorMsg = 'Error en el servidor.';
+            
+            if (err.status === 413) {
+              errorMsg = 'El archivo es demasiado grande.';
+            } else if (err.error && typeof err.error === 'object') {
+              errorMsg = err.error.message || err.error.error || errorMsg;
+            } else if (typeof err.error === 'string') {
+              errorMsg = err.error;
+            }
+
             this.showNotification(errorMsg, 'error');
             this.avatarPreview = null;
           });
