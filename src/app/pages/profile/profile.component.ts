@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Users } from '../../services/users/users';
+import { finalize } from 'rxjs';
 
 
 @Component({
@@ -14,23 +15,40 @@ export class ProfileComponent implements OnInit {
   isLoading: boolean = true;
   errorMessage: string = '';
 
-  constructor(private usersService: Users) { }
+  constructor(
+    private usersService: Users,
+    private zone: NgZone,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.loadUserProfile();
   }
 
   loadUserProfile(): void {
-    this.usersService.getUserProfile().subscribe({
-      next: (data) => {
-        this.user = data;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error al cargar perfil:', err);
-        this.errorMessage = 'No se pudo cargar la información del perfil.';
-        this.isLoading = false;
-      }
-    });
+    this.isLoading = true;
+    this.usersService.getUserProfile()
+      .pipe(
+        finalize(() => {
+          this.zone.run(() => {
+            this.isLoading = false;
+            this.cdr.detectChanges();
+          });
+        })
+      )
+      .subscribe({
+        next: (data) => {
+          this.zone.run(() => {
+            console.log('Perfil cargado:', data);
+            this.user = data;
+          });
+        },
+        error: (err) => {
+          this.zone.run(() => {
+            console.error('Error al cargar perfil:', err);
+            this.errorMessage = 'No se pudo cargar la información del perfil.';
+          });
+        }
+      });
   }
 }
