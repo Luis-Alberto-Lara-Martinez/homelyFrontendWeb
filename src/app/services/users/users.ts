@@ -61,6 +61,16 @@ export class Users {
     );
   }
 
+  isAdmin(): boolean {
+    const user = this.userSubject.value;
+    if (!user) return false;
+    
+    // Para el TFG: permitimos admin si tiene el rol o si su correo es de la organización
+    return user.role === 'ADMIN' || 
+           (user.email && user.email.endsWith('@homing.es')) ||
+           user.email === 'alejandro@homing.es';
+  }
+
   // Actualizar perfil (PUT /api/user/profile)
   updateUserProfile(name?: string, avatarFile?: File): Observable<any> {
     const token = localStorage.getItem('token');

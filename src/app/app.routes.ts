@@ -27,6 +27,18 @@ export const routes: Routes = [
     title: 'Homely - Trabaja con Nosotros'
   },
   {
+    path: 'admin/usuarios',
+    loadComponent: () => import('./pages/admin-users/admin-users.component').then(m => m.AdminUsersComponent),
+    canActivate: [authGuard],
+    title: 'Homely - Administrar Usuarios'
+  },
+  {
+    path: 'admin/propiedades',
+    loadComponent: () => import('./pages/admin-properties/admin-properties.component').then(m => m.AdminPropertiesComponent),
+    canActivate: [authGuard],
+    title: 'Homely - Administrar Propiedades'
+  },
+  {
     path: 'propiedad/:id',
     component: PropertyDetailsComponent,
     canActivate: [authGuard],

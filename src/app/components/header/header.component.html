@@ -21,6 +21,25 @@
           class="px-4 py-2 rounded-full text-gray-600 font-bold hover:bg-gray-50 transition-all duration-300 whitespace-nowrap">Sobre Nosotros</a>
         <a routerLink="/contacto" routerLinkActive="bg-brand-blue/10 !text-brand-blue"
           class="px-4 py-2 rounded-full text-gray-600 font-bold hover:bg-gray-50 transition-all duration-300">Contacto</a>
+
+        <!-- Admin Links -->
+        <ng-container *ngIf="usersService.isAdmin()">
+          <div class="h-6 w-px bg-gray-200 mx-2 hidden lg:block"></div>
+          <a routerLink="/admin/usuarios" routerLinkActive="bg-brand-blue/10 !text-brand-blue"
+            class="px-4 py-2 rounded-full text-brand-dark font-bold hover:bg-brand-blue/5 border border-brand-blue/20 transition-all duration-300 whitespace-nowrap">
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              Usuarios
+            </span>
+          </a>
+          <a routerLink="/admin/propiedades" routerLinkActive="bg-brand-blue/10 !text-brand-blue"
+            class="px-4 py-2 rounded-full text-brand-dark font-bold hover:bg-brand-blue/5 border border-brand-blue/20 transition-all duration-300 whitespace-nowrap">
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              Propiedades
+            </span>
+          </a>
+        </ng-container>
       </nav>
 
       <!-- Botones de inicio de sesión y registro -->
@@ -102,6 +121,19 @@
         <a routerLink="/contacto" routerLinkActive="text-brand-blue"
           class="block text-gray-500 font-medium hover:text-brand-blue transition-colors"
           (click)="closeMenu()">Contacto</a>
+
+        <!-- Admin Links Mobile -->
+        <ng-container *ngIf="usersService.isAdmin()">
+          <div class="pt-2 mt-2 border-t border-gray-100">
+            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400 px-3">Administración</span>
+            <a routerLink="/admin/usuarios" routerLinkActive="text-brand-blue"
+              class="block text-gray-500 font-medium hover:text-brand-blue transition-colors px-3 py-2"
+              (click)="closeMenu()">Administrar Usuarios</a>
+            <a routerLink="/admin/propiedades" routerLinkActive="text-brand-blue"
+              class="block text-gray-500 font-medium hover:text-brand-blue transition-colors px-3 py-2"
+              (click)="closeMenu()">Administrar Propiedades</a>
+          </div>
+        </ng-container>
 
         <div class="pt-3 border-t border-gray-200 flex flex-col gap-2">
           <ng-container *ngIf="!usersService.isAuthenticated()">
