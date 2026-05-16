@@ -52,11 +52,21 @@ export class Users {
     return this.http.get<any>(`${this.baseUrl}/profile`, { headers });
   }
 
-  // Actualizar perfil (PUT /api/user/profile, con avatar opcional)
-  updateUserProfile(profileData: FormData): Observable<any> {
+  // Actualizar perfil (PUT /api/user/profile)
+  updateUserProfile(name?: string, avatarFile?: File): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.put<any>(`${this.baseUrl}/profile`, profileData, { headers });
+    
+    const formData = new FormData();
+    if (name) {
+      // Usamos un Blob para el String si es @RequestPart en el back
+      formData.append('name', new Blob([name], { type: 'application/json' }));
+    }
+    if (avatarFile) {
+      formData.append('avatarFile', avatarFile);
+    }
+    
+    return this.http.put<any>(`${this.baseUrl}/profile`, formData, { headers });
   }
 
   // Cambiar contraseña (PUT /api/user/password)

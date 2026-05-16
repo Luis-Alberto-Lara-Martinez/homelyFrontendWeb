@@ -2,13 +2,13 @@ import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Users } from '../../services/users/users';
 import { finalize } from 'rxjs';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './profile.component.html'
 })
 export class ProfileComponent implements OnInit {
@@ -27,6 +27,15 @@ export class ProfileComponent implements OnInit {
   showOldPassword: boolean = false;
   showNewPassword: boolean = false;
   showConfirmPassword: boolean = false;
+
+  // Edición de Perfil
+  isEditingProfile: boolean = false;
+  editName: string = '';
+  selectedFile: File | null = null;
+  avatarPreview: string | null = null;
+  isSavingProfile: boolean = false;
+  profileSuccessMessage: string = '';
+  profileErrorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -136,8 +145,70 @@ export class ProfileComponent implements OnInit {
             });
           }
         });
-    } else {
-      this.passwordForm.markAllAsTouched();
     }
+  }
+
+  toggleEditProfile(): void {
+    this.isEditingProfile = !this.isEditingProfile;
+    if (this.isEditingProfile) {
+      this.editName = this.user?.name || '';
+      this.profileSuccessMessage = '';
+      this.profileErrorMessage = '';
+    } else {
+      this.selectedFile = null;
+      this.avatarPreview = null;
+    }
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.avatarPreview = reader.result as string;
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onUpdateProfile(): void {
+    if (!this.editName.trim() && !this.selectedFile) return;
+
+    this.isSavingProfile = true;
+    this.profileSuccessMessage = '';
+    this.profileErrorMessage = '';
+
+    this.usersService.updateUserProfile(this.editName, this.selectedFile || undefined)
+      .pipe(
+        finalize(() => {
+          this.zone.run(() => {
+            this.isSavingProfile = false;
+            this.cdr.detectChanges();
+          });
+        })
+      )
+      .subscribe({
+        next: (updatedUser) => {
+          this.zone.run(() => {
+            this.user = updatedUser;
+            this.isEditingProfile = false;
+            this.profileSuccessMessage = 'Perfil actualizado correctamente.';
+            this.selectedFile = null;
+            this.avatarPreview = null;
+            setTimeout(() => {
+              this.profileSuccessMessage = '';
+              this.cdr.detectChanges();
+            }, 3000);
+          });
+        },
+        error: (err) => {
+          this.zone.run(() => {
+            console.error('Error al actualizar perfil:', err);
+            this.profileErrorMessage = 'No se pudo actualizar el perfil.';
+          });
+        }
+      });
   }
 }
