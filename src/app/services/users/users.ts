@@ -61,14 +61,34 @@ export class Users {
     );
   }
 
+  private decodeToken(token: string): any {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      return null;
+    }
+  }
+
   isAdmin(): boolean {
-    const user = this.userSubject.value;
-    if (!user) return false;
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+
+    const payload = this.decodeToken(token);
+    if (!payload) return false;
+
+    // Extraemos el rol. Dependiendo de tu back, puede estar en 'role', 'roles' o 'sub'
+    const role = payload.role || payload.roles || payload.authorities;
     
-    // Para el TFG: permitimos admin si tiene el rol o si su correo es de la organización
-    return user.role === 'ADMIN' || 
-           (user.email && user.email.endsWith('@homing.es')) ||
-           user.email === 'alejandro@homing.es';
+    const isAdminRole = Array.isArray(role) 
+      ? role.some(r => r.toLowerCase() === 'admin')
+      : (typeof role === 'string' && role.toLowerCase() === 'admin');
+
+    return isAdminRole;
   }
 
   // Actualizar perfil (PUT /api/user/profile)
