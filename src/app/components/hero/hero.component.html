@@ -32,61 +32,95 @@
     <div class="mt-12 max-w-6xl mx-auto">
       <div
         class="bg-white p-4 rounded-2xl shadow-xl shadow-brand-dark/10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 border border-gray-100 hover:shadow-2xl hover:shadow-brand-blue/15 transition-shadow duration-300 w-full text-center items-center">
-        
+
         <div class="group flex flex-col items-center px-2">
           <label
             class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 group-focus-within:text-brand-blue transition-colors">Ubicación</label>
           <div class="relative w-full">
             <input type="text" placeholder="Ciudad, barrio..." [(ngModel)]="location"
               class="w-full bg-gray-50 rounded-xl pl-4 pr-10 py-3 text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue/30 transition-all text-center">
-            <button (click)="openMapModal()" 
+            <button (click)="openMapModal()"
               class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-blue p-1.5 rounded-lg hover:bg-brand-blue/10 transition-colors"
               title="Seleccionar en mapa">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
               </svg>
             </button>
           </div>
         </div>
-        
-        <div class="group md:border-l md:border-gray-100 flex flex-col items-center px-2">
+
+        <!-- Col: Tipo de Propiedad (Custom Dropdown) -->
+        <div class="group md:border-l md:border-gray-100 flex flex-col items-center px-2 relative">
           <label
-            class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 group-focus-within:text-brand-blue transition-colors">Tipo
+            class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 group-focus-within:text-brand-blue transition-colors">Tipo
             de Propiedad</label>
-          <select
-            class="w-full bg-gray-50 rounded-xl px-4 py-3 text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue/30 transition-all appearance-none cursor-pointer text-center">
-            <option>Cualquier tipo</option>
-            <option>Casa o Chalet</option>
-            <option>Apartamento</option>
-            <option>Villa de Lujo</option>
-            <option>Estudio</option>
-          </select>
+          <div class="relative w-full">
+            <button (click)="togglePropertyType()" type="button"
+              class="w-full bg-gray-50/50 hover:bg-gray-50 border-2 border-transparent rounded-2xl px-5 py-3.5 text-gray-800 font-bold outline-none focus:bg-white focus:ring-4 focus:ring-brand-blue/10 transition-all text-center pr-10 flex items-center justify-center min-h-[56px]">
+              {{ selectedPropertyType }}
+            </button>
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-brand-blue transition-colors">
+              <svg class="w-5 h-5 transition-transform duration-200" [class.rotate-180]="propertyTypeOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+
+            <!-- Options List -->
+            <div *ngIf="propertyTypeOpen" 
+              class="absolute z-50 left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+              <div class="max-h-60 overflow-y-auto">
+                <div *ngFor="let type of propertyTypes" (click)="selectPropertyType(type)"
+                  class="px-5 py-3 text-sm font-bold text-gray-700 hover:bg-brand-blue hover:text-white cursor-pointer transition-colors text-center border-b border-gray-50 last:border-0"
+                  [class.bg-brand-blue/5]="type === selectedPropertyType">
+                  {{ type }}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="group lg:border-l lg:border-gray-100 flex flex-col items-center px-2">
+        <!-- Col: Operación (Custom Dropdown) -->
+        <div class="group lg:border-l lg:border-gray-100 flex flex-col items-center px-2 relative">
           <label
-            class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 group-focus-within:text-brand-blue transition-colors">Operación</label>
-          <select
-            class="w-full bg-gray-50 rounded-xl px-4 py-3 text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue/30 transition-all appearance-none cursor-pointer text-center">
-            <option>Comprar</option>
-            <option>Alquilar</option>
-          </select>
+            class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 group-focus-within:text-brand-blue transition-colors">Operación</label>
+          <div class="relative w-full">
+            <button (click)="toggleOperation()" type="button"
+              class="w-full bg-gray-50/50 hover:bg-gray-50 border-2 border-transparent rounded-2xl px-5 py-3.5 text-gray-800 font-bold outline-none focus:bg-white focus:ring-4 focus:ring-brand-blue/10 transition-all text-center pr-10 flex items-center justify-center min-h-[56px]">
+              {{ selectedOperation }}
+            </button>
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-brand-blue transition-colors">
+              <svg class="w-5 h-5 transition-transform duration-200" [class.rotate-180]="operationOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+
+            <!-- Options List -->
+            <div *ngIf="operationOpen" 
+              class="absolute z-50 left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+              <div *ngFor="let op of operations" (click)="selectOperation(op)"
+                class="px-5 py-3 text-sm font-bold text-gray-700 hover:bg-brand-blue hover:text-white cursor-pointer transition-colors text-center border-b border-gray-50 last:border-0"
+                [class.bg-brand-blue/5]="op === selectedOperation">
+                {{ op }}
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="group md:border-l md:border-gray-100 lg:border-l lg:border-gray-100 flex flex-col justify-center px-4 w-full">
+        <div
+          class="group md:border-l md:border-gray-100 lg:border-l lg:border-gray-100 flex flex-col justify-center px-4 w-full">
           <div class="flex justify-between items-center mb-2 w-full">
-            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider group-focus-within:text-brand-blue transition-colors">
+            <label
+              class="block text-xs font-semibold text-gray-500 uppercase tracking-wider group-focus-within:text-brand-blue transition-colors">
               Precio Máx
             </label>
-            <span class="text-sm font-bold text-brand-dark bg-brand-blue/10 px-2 py-0.5 rounded-md">{{ maxPrice | number:'1.0-0' }} €</span>
+            <span class="text-sm font-bold text-brand-dark bg-brand-blue/10 px-2 py-0.5 rounded-md">{{ maxPrice |
+              number:'1.0-0' }} €</span>
           </div>
           <div class="w-full">
-            <input type="range" 
-              min="50000" 
-              max="2000000" 
-              step="10000" 
-              [(ngModel)]="maxPrice"
+            <input type="range" min="50000" max="2000000" step="10000" [(ngModel)]="maxPrice"
               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30 transition-all">
           </div>
           <div class="flex justify-between w-full mt-1">
@@ -95,7 +129,8 @@
           </div>
         </div>
 
-        <div class="flex items-center justify-center mt-4 md:mt-0 md:col-span-2 lg:col-span-1 lg:border-l lg:border-gray-100 px-2 h-full w-full">
+        <div
+          class="flex items-center justify-center mt-4 md:mt-0 md:col-span-2 lg:col-span-1 lg:border-l lg:border-gray-100 px-2 h-full w-full">
           <button
             class="w-full bg-gradient-brand text-white py-4 rounded-xl font-bold hover:shadow-lg hover:shadow-brand-blue/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex justify-center items-center gap-2 h-full max-h-14">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,41 +146,56 @@
 </section>
 
 <!-- Modal del Mapa Interactivo -->
-<div *ngIf="showMapModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in">
+<div *ngIf="showMapModal"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in">
   <!-- Desktop optimized modal: flex-row on md screens -->
-  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl h-[85vh] md:h-[70vh] flex flex-col md:flex-row overflow-hidden animate-fade-in-up relative">
-    
+  <div
+    class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl h-[85vh] md:h-[70vh] flex flex-col md:flex-row overflow-hidden animate-fade-in-up relative">
+
     <!-- Left panel: Controls -->
-    <div class="w-full md:w-1/3 md:min-w-[320px] bg-white flex flex-col h-full z-10 shadow-[10px_0_20px_rgba(0,0,0,0.05)]">
+    <div
+      class="w-full md:w-1/3 md:min-w-[320px] bg-white flex flex-col h-full z-10 shadow-[10px_0_20px_rgba(0,0,0,0.05)]">
       <!-- Header -->
       <div class="px-6 py-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
         <h3 class="text-xl font-bold text-brand-dark leading-tight">
           Selecciona tu <br><span class="text-brand-blue">ubicación ideal</span>
         </h3>
         <!-- Mobile close button -->
-        <button (click)="closeMapModal()" class="md:hidden text-gray-400 hover:text-red-500 bg-white shadow-sm p-2 rounded-full transition-colors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <button (click)="closeMapModal()"
+          class="md:hidden text-gray-400 hover:text-red-500 bg-white shadow-sm p-2 rounded-full transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
         </button>
       </div>
 
       <!-- Scrollable content -->
       <div class="p-6 flex-1 overflow-y-auto flex flex-col gap-8">
-        
+
         <!-- Buscar ciudad -->
         <div class="space-y-3">
           <label class="font-bold text-gray-700 text-sm uppercase tracking-wide">Buscar ciudad o zona</label>
           <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
             </div>
             <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="searchCity()" placeholder="Ej: Madrid Centro"
-                   class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-11 pr-4 text-gray-800 font-medium outline-none focus:bg-white focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 transition-all">
+              class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-11 pr-4 text-gray-800 font-medium outline-none focus:bg-white focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 transition-all">
           </div>
         </div>
 
         <!-- Ubicación actual -->
-        <button (click)="useCurrentLocation()" class="w-full flex items-center justify-center gap-2 bg-brand-blue/5 text-brand-blue font-bold hover:bg-brand-blue/10 border border-brand-blue/10 transition-colors py-3.5 rounded-xl">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        <button (click)="useCurrentLocation()"
+          class="w-full flex items-center justify-center gap-2 bg-brand-blue/5 text-brand-blue font-bold hover:bg-brand-blue/10 border border-brand-blue/10 transition-colors py-3.5 rounded-xl">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z">
+            </path>
+          </svg>
           Utilizar mi ubicación actual
         </button>
 
@@ -156,15 +206,18 @@
             <span class="font-bold text-brand-blue bg-brand-blue/10 px-3 py-1 rounded-lg">{{distance}} km</span>
           </div>
           <input type="range" min="1" max="50" step="1" [(ngModel)]="distance" (input)="updateCircle()"
-                 class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-blue">
+            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-blue">
         </div>
       </div>
 
       <!-- Footer action -->
       <div class="p-6 border-t border-gray-100 bg-gray-50">
-        <button (click)="applyLocation()" class="w-full bg-gradient-brand text-white font-bold py-4 rounded-xl hover:shadow-lg hover:shadow-brand-blue/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+        <button (click)="applyLocation()"
+          class="w-full bg-gradient-brand text-white font-bold py-4 rounded-xl hover:shadow-lg hover:shadow-brand-blue/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
           Aplicar ubicación
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
         </button>
       </div>
     </div>
@@ -172,14 +225,18 @@
     <!-- Right panel: Map -->
     <div class="w-full md:w-2/3 h-64 md:h-full relative bg-gray-100 flex-shrink-0 md:flex-shrink">
       <!-- Desktop close button -->
-      <button (click)="closeMapModal()" class="hidden md:flex absolute top-4 right-4 z-[1000] bg-white text-gray-500 hover:text-red-500 shadow-md p-2 rounded-full transition-colors">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      <button (click)="closeMapModal()"
+        class="hidden md:flex absolute top-4 right-4 z-[1000] bg-white text-gray-500 hover:text-red-500 shadow-md p-2 rounded-full transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
       </button>
-      
+
       <div id="map-container" class="absolute inset-0 w-full h-full z-0"></div>
-      
+
       <!-- Overlay helper text on map -->
-      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-white/20 text-sm font-bold text-gray-700 pointer-events-none whitespace-nowrap">
+      <div
+        class="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-white/20 text-sm font-bold text-gray-700 pointer-events-none whitespace-nowrap">
         Haz clic en el mapa para marcar el centro
       </div>
     </div>

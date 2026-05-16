@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -22,7 +22,45 @@ export class HeroComponent {
   tempLocationData: any = null;
   private circle: any;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  // Custom Dropdowns
+  propertyTypeOpen = false;
+  operationOpen = false;
+  
+  propertyTypes = ['Cualquier tipo', 'Casa o Chalet', 'Apartamento', 'Villa de Lujo', 'Estudio'];
+  selectedPropertyType = 'Cualquier tipo';
+
+  operations = ['Comprar', 'Alquilar'];
+  selectedOperation = 'Comprar';
+
+  constructor(private cdr: ChangeDetectorRef, private el: ElementRef) {}
+
+  @HostListener('document:click', ['$event'])
+  onClick(event: MouseEvent) {
+    if (!this.el.nativeElement.contains(event.target)) {
+      this.propertyTypeOpen = false;
+      this.operationOpen = false;
+    }
+  }
+
+  togglePropertyType() {
+    this.propertyTypeOpen = !this.propertyTypeOpen;
+    this.operationOpen = false;
+  }
+
+  toggleOperation() {
+    this.operationOpen = !this.operationOpen;
+    this.propertyTypeOpen = false;
+  }
+
+  selectPropertyType(type: string) {
+    this.selectedPropertyType = type;
+    this.propertyTypeOpen = false;
+  }
+
+  selectOperation(op: string) {
+    this.selectedOperation = op;
+    this.operationOpen = false;
+  }
 
   openMapModal() {
     this.showMapModal = true;
