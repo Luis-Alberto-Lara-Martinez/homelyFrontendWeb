@@ -9,6 +9,7 @@ import { VentasComponent } from './pages/ventas/ventas.component';
 import { CalculadoraComponent } from './pages/calculadora/calculadora.component';
 import { authGuard } from './guards/auth-guard'; // Importamos el Guard
 import { ProfileComponent } from './pages/profile/profile.component';
+import { FavoritesComponent } from './pages/favorites/favorites.component';
 
 export const routes: Routes = [
   {
@@ -16,6 +17,12 @@ export const routes: Routes = [
     component: ProfileComponent,
     canActivate: [authGuard],
     title: 'Homely - Mi Cuenta'
+  },
+  {
+    path: 'favoritos',
+    component: FavoritesComponent,
+    canActivate: [authGuard],
+    title: 'Homely - Mis Favoritos'
   },
   {
     path: 'calculadora',
