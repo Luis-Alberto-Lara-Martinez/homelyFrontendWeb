@@ -12,12 +12,19 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { FavoritesComponent } from './pages/favorites/favorites.component';
 import { PropertyDetailsComponent } from './pages/property-details/property-details.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
+import { TrabajaConNosotrosComponent } from './pages/trabaja-con-nosotros/trabaja-con-nosotros.component';
 
 export const routes: Routes = [
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent,
     title: 'Homely - Recuperar Contraseña'
+  },
+  {
+    path: 'trabaja-con-nosotros',
+    component: TrabajaConNosotrosComponent,
+    canActivate: [authGuard],
+    title: 'Homely - Trabaja con Nosotros'
   },
   {
     path: 'propiedad/:id',
