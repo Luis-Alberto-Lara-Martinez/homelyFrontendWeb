@@ -22,6 +22,16 @@ export class HeroComponent {
   tempLocationData: any = null;
   private circle: any;
 
+  get formattedMaxPrice(): string {
+    if (!this.maxPrice && this.maxPrice !== 0) return '';
+    return new Intl.NumberFormat('en-US').format(this.maxPrice);
+  }
+
+  set formattedMaxPrice(value: string) {
+    const cleanValue = value.replace(/\D/g, '');
+    this.maxPrice = cleanValue ? parseInt(cleanValue, 10) : 0;
+  }
+
   // Custom Dropdowns
   propertyTypeOpen = false;
   operationOpen = false;
