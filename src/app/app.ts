@@ -21,7 +21,7 @@ export class App implements OnInit {
   private location = inject(Location);
 
   ngOnInit() {
-    const hiddenRoutes = ['/login', '/registro'];
+    const hiddenRoutes = ['/login', '/registro', '/forgot-password'];
     
     // 1. Comprobación síncrona INMEDIATA para la primera carga de la página
     const initialPath = this.location.path().split('?')[0] || window.location.pathname;

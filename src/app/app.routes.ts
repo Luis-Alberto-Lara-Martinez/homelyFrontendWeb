@@ -11,8 +11,14 @@ import { authGuard } from './guards/auth-guard'; // Importamos el Guard
 import { ProfileComponent } from './pages/profile/profile.component';
 import { FavoritesComponent } from './pages/favorites/favorites.component';
 import { PropertyDetailsComponent } from './pages/property-details/property-details.component';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 
 export const routes: Routes = [
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent,
+    title: 'Homely - Recuperar Contraseña'
+  },
   {
     path: 'propiedad/:id',
     component: PropertyDetailsComponent,
