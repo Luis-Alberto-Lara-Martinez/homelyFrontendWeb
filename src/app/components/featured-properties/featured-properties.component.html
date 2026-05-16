@@ -17,7 +17,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
       <!-- Tarjeta de propiedad 1 -->
-      <article
+      <article [routerLink]="['/propiedad', 1]"
         class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-brand-blue/15 transition-all duration-300 group border border-gray-100 cursor-pointer flex flex-col h-full">
         <div class="relative h-64 overflow-hidden">
           <img src="/assets/img/house-1.jpg" alt="Villa en Madrid"
@@ -72,7 +72,7 @@
       </article>
 
       <!-- Tarjeta de propiedad 2 -->
-      <article
+      <article [routerLink]="['/propiedad', 2]"
         class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-brand-blue/15 transition-all duration-300 group border border-gray-100 cursor-pointer flex flex-col h-full">
         <div class="relative h-64 overflow-hidden">
           <img src="/assets/img/house-2.jpg" alt="Apartamento Barcelona"
@@ -127,7 +127,7 @@
       </article>
 
       <!-- Property Card 3 -->
-      <article
+      <article [routerLink]="['/propiedad', 3]"
         class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-brand-blue/15 transition-all duration-300 group border border-gray-100 cursor-pointer flex flex-col h-full">
         <div class="relative h-64 overflow-hidden">
           <img src="/assets/img/house-3.jpg" alt="Casa Valencia"

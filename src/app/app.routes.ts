@@ -10,8 +10,15 @@ import { CalculadoraComponent } from './pages/calculadora/calculadora.component'
 import { authGuard } from './guards/auth-guard'; // Importamos el Guard
 import { ProfileComponent } from './pages/profile/profile.component';
 import { FavoritesComponent } from './pages/favorites/favorites.component';
+import { PropertyDetailsComponent } from './pages/property-details/property-details.component';
 
 export const routes: Routes = [
+  {
+    path: 'propiedad/:id',
+    component: PropertyDetailsComponent,
+    canActivate: [authGuard],
+    title: 'Homely - Detalles de Propiedad'
+  },
   {
     path: 'mi-cuenta',
     component: ProfileComponent,
