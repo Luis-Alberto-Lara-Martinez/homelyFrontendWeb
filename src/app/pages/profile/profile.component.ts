@@ -15,14 +15,14 @@ export class ProfileComponent implements OnInit {
   user: any = null;
   isLoading: boolean = true;
   errorMessage: string = '';
-  
+
   // Cambio de contraseña
   passwordForm: FormGroup;
   showPasswordForm: boolean = false;
   isUpdatingPassword: boolean = false;
   passwordSuccessMessage: string = '';
   passwordErrorMessage: string = '';
-  
+
   // Visibilidad de contraseñas
   showOldPassword: boolean = false;
   showNewPassword: boolean = false;
@@ -35,7 +35,6 @@ export class ProfileComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {
     this.passwordForm = this.fb.group({
-      oldPassword: ['', [Validators.required]],
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
     }, { validator: this.passwordMatchValidator });
@@ -98,12 +97,11 @@ export class ProfileComponent implements OnInit {
       this.passwordSuccessMessage = '';
       this.passwordErrorMessage = '';
 
-      const { oldPassword, newPassword, confirmPassword } = this.passwordForm.value;
+      const { newPassword, confirmPassword } = this.passwordForm.value;
 
-      this.usersService.updateUserPassword({ 
-        password: oldPassword, 
-        newPassword, 
-        confirmedPassword: confirmPassword 
+      this.usersService.updateUserPassword({
+        password: newPassword.trim(),
+        confirmedPassword: confirmPassword.trim()
       })
         .pipe(
           finalize(() => {

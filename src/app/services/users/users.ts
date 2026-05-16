@@ -1,8 +1,8 @@
 // users.service.ts (Ejemplo en Angular)
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {environment} from '../../../environments/environment';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +24,7 @@ export class Users {
     return this.http.post<any>(
       `${environment.backendUrl}/oauth2/login`,
       {},
-      {headers}
+      { headers }
     );
   }
 
@@ -49,27 +49,27 @@ export class Users {
   getUserProfile(): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any>(`${this.baseUrl}/profile`, {headers});
+    return this.http.get<any>(`${this.baseUrl}/profile`, { headers });
   }
 
   // Actualizar perfil (PUT /api/user/profile, con avatar opcional)
   updateUserProfile(profileData: FormData): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.put<any>(`${this.baseUrl}/profile`, profileData, {headers});
+    return this.http.put<any>(`${this.baseUrl}/profile`, profileData, { headers });
   }
 
   // Cambiar contraseña (PUT /api/user/password)
-  updateUserPassword(passwordData: { password: string; newPassword: string; confirmedPassword: string }): Observable<any> {
+  updateUserPassword(passwordData: { password: string; confirmedPassword: string }): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.put<any>(`${this.baseUrl}/password`, passwordData, {headers});
+    return this.http.put<any>(`${this.baseUrl}/password`, passwordData, { headers });
   }
 
   // Obtener todos los usuarios (para admin, GET /admin/users - si está habilitado)
   getAllUsers(): Observable<any[]> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any[]>(`${this.baseUrl}/admin/users`, {headers});
+    return this.http.get<any[]>(`${this.baseUrl}/admin/users`, { headers });
   }
 }
