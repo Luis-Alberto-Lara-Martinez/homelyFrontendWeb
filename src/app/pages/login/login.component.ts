@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {Router, RouterLink} from '@angular/router';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Users} from '../../services/users/users';
-import {environment} from '../../../environments/environment';
+import {Component, OnInit, NgZone, ChangeDetectorRef} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Users } from '../../services/users/users';
+import { environment } from '../../../environments/environment';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,9 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private usersService: Users,
-    private router: Router
+    private router: Router,
+    private zone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -40,22 +43,40 @@ export class LoginComponent implements OnInit {
       this.isLoading = true;
       this.errorMessage = '';
 
-      this.usersService.login(this.loginForm.value).subscribe({
-        next: (response) => {
-          console.log('Respuesta del backend:', response);
-          if (response && response.token) {
-            localStorage.setItem('token', response.token);
-            this.router.navigate(['/home']);
-          } else {
-            this.isLoading = false;
-            this.errorMessage = 'El servidor no devolvió un token válido. Contacte con soporte.';
+      this.usersService.login(this.loginForm.value)
+        .pipe(
+          finalize(() => {
+            this.zone.run(() => {
+              this.isLoading = false;
+              this.cdr.detectChanges();
+            });
+          })
+        )
+        .subscribe({
+          next: (response) => {
+            this.zone.run(() => {
+              console.log('Respuesta del backend:', response);
+              if (response && response.token) {
+                localStorage.setItem('token', response.token);
+                this.router.navigate(['/home']);
+              } else {
+                this.errorMessage = response?.message || 'El servidor no devolvió un token válido.';
+              }
+            });
+          },
+          error: (err) => {
+            this.zone.run(() => {
+              console.error('Error en el login:', err);
+              if (err.error && typeof err.error === 'object') {
+                this.errorMessage = err.error.message || err.error.error || 'Credenciales incorrectas.';
+              } else if (typeof err.error === 'string') {
+                this.errorMessage = err.error;
+              } else {
+                this.errorMessage = 'Credenciales inválidas o error en el servidor.';
+              }
+            });
           }
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.errorMessage = 'Credenciales inválidas o error en el servidor.';
-        }
-      });
+        });
     } else {
       this.loginForm.markAllAsTouched();
     }
@@ -116,18 +137,39 @@ export class LoginComponent implements OnInit {
       const idToken = params.get('id_token');
 
       if (idToken) {
-        this.usersService.oauth2login(idToken).subscribe({
-          next: (response) => {
-            if (response && response.token) {
-              localStorage.setItem('token', response.token);
-              window.history.replaceState(null, '', window.location.pathname);
-              this.router.navigate(['/home']);
+        this.isLoading = true;
+        this.usersService.oauth2login(idToken)
+          .pipe(
+            finalize(() => {
+              this.zone.run(() => {
+                this.isLoading = false;
+                this.cdr.detectChanges();
+              });
+            })
+          )
+          .subscribe({
+            next: (response) => {
+              this.zone.run(() => {
+                if (response && response.token) {
+                  localStorage.setItem('token', response.token);
+                  window.history.replaceState(null, '', window.location.pathname);
+                  this.router.navigate(['/home']);
+                } else {
+                  this.errorMessage = 'Error al procesar el inicio de sesión social.';
+                }
+              });
+            },
+            error: (err) => {
+              this.zone.run(() => {
+                console.error('Error en OAuth login:', err);
+                if (err.error && typeof err.error === 'object') {
+                  this.errorMessage = err.error.message || err.error.error || 'Error en el login social.';
+                } else {
+                  this.errorMessage = typeof err.error === 'string' ? err.error : 'Error al conectar con el servidor.';
+                }
+              });
             }
-          },
-          error: (err) => {
-            this.errorMessage = err.error;
-          }
-        });
+          });
       }
     }
   }
