@@ -34,7 +34,7 @@ export class TrabajaConNosotrosComponent {
   onSubmit() {
     console.log('Solicitud enviada:', this.formData);
     this.submitted = true;
-    
+
     // Simulate API call
     setTimeout(() => {
       // In a real app, we would send this to the backend
