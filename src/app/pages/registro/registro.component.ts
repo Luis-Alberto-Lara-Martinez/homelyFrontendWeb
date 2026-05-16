@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Users } from '../../services/users/users';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-registro',
@@ -21,21 +22,20 @@ export class RegistroComponent {
     private router: Router
   ) {
     this.registroForm = this.fb.group({
-      nombre: ['', Validators.required],
-      apellidos: ['', Validators.required],
+      name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      password_confirmation: ['', Validators.required]
+      confirmedPassword: ['', Validators.required]
     }, { validators: this.passwordsMatchValidator });
   }
 
   // Validador personalizado para comprobar que las contraseñas coinciden
   passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password');
-    const password_confirmation = control.get('password_confirmation');
+    const confirmedPassword = control.get('confirmedPassword');
 
-    if (password && password_confirmation && password.value !== password_confirmation.value) {
-      password_confirmation.setErrors({ passwordsMismatch: true });
+    if (password && confirmedPassword && password.value !== confirmedPassword.value) {
+      confirmedPassword.setErrors({ passwordsMismatch: true });
       return { passwordsMismatch: true };
     }
     return null;
@@ -46,25 +46,35 @@ export class RegistroComponent {
       this.isLoading = true;
       this.errorMessage = '';
       
-      // Extraemos todo menos password_confirmation
-      const { password_confirmation, ...userData } = this.registroForm.value;
+      const { name, email, password, confirmedPassword } = this.registroForm.value;
+      
+      const userData = {
+        name: name.trim(),
+        email: email.trim(),
+        password: password,
+        confirmedPassword: confirmedPassword
+      };
 
-      this.usersService.register(userData).subscribe({
-        next: (response) => {
-          // Si el servidor devuelve el token, iniciamos sesión automáticamente
-          if (response && response.token) {
-            localStorage.setItem('token', response.token);
-            this.router.navigate(['/home']);
-          } else {
-            // Si no devuelve token, lo mandamos al login para que inicie sesión
-            this.router.navigate(['/login']);
+      this.usersService.register(userData)
+        .pipe(
+          finalize(() => {
+            this.isLoading = false;
+          })
+        )
+        .subscribe({
+          next: (response) => {
+            if (response && response.token) {
+              localStorage.setItem('token', response.token);
+              this.router.navigate(['/home']);
+            } else {
+              this.router.navigate(['/login']);
+            }
+          },
+          error: (err) => {
+            console.error('Error en registro:', err);
+            this.errorMessage = err.error?.message || 'Error al registrar el usuario. El correo podría estar ya en uso.';
           }
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.errorMessage = 'Error al registrar el usuario. El correo podría estar ya en uso.';
-        }
-      });
+        });
     } else {
       this.registroForm.markAllAsTouched();
     }

@@ -28,35 +28,24 @@
 
       <form class="space-y-6" [formGroup]="registroForm" (ngSubmit)="onSubmit()">
 
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <!-- Input: Nombre -->
-          <div>
-            <label for="nombre" class="block text-sm font-bold text-gray-700 tracking-wide mb-2 uppercase">
-              Nombre
-            </label>
-            <div class="mt-1 relative rounded-2xl shadow-sm group">
-              <input id="nombre" formControlName="nombre" type="text" autocomplete="given-name"
-                class="appearance-none block w-full px-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-0 focus:border-brand-blue text-base text-gray-900 placeholder-gray-400 bg-gray-50/50 focus:bg-white transition-all duration-300"
-                placeholder="Tu nombre">
+        <!-- Input: Nombre Completo -->
+        <div>
+          <label for="name" class="block text-sm font-bold text-gray-700 tracking-wide mb-2 uppercase">
+            Nombre completo
+          </label>
+          <div class="mt-1 relative rounded-2xl shadow-sm group">
+            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+              <svg class="h-6 w-6 text-gray-400 group-focus-within:text-brand-blue transition-colors duration-300"
+                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
             </div>
-            <div *ngIf="registroForm.get('nombre')?.touched && registroForm.get('nombre')?.invalid" class="text-red-500 text-sm mt-1 font-medium">
-              El nombre es obligatorio.
-            </div>
+            <input id="name" formControlName="name" type="text" autocomplete="name"
+              class="appearance-none block w-full pl-14 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-0 focus:border-brand-blue text-base text-gray-900 placeholder-gray-400 bg-gray-50/50 focus:bg-white transition-all duration-300"
+              placeholder="Tu nombre completo">
           </div>
-
-          <!-- Input: Apellidos -->
-          <div>
-            <label for="apellidos" class="block text-sm font-bold text-gray-700 tracking-wide mb-2 uppercase">
-              Apellidos
-            </label>
-            <div class="mt-1 relative rounded-2xl shadow-sm group">
-              <input id="apellidos" formControlName="apellidos" type="text" autocomplete="family-name"
-                class="appearance-none block w-full px-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-0 focus:border-brand-blue text-base text-gray-900 placeholder-gray-400 bg-gray-50/50 focus:bg-white transition-all duration-300"
-                placeholder="Tus apellidos">
-            </div>
-            <div *ngIf="registroForm.get('apellidos')?.touched && registroForm.get('apellidos')?.invalid" class="text-red-500 text-sm mt-1 font-medium">
-              Los apellidos son obligatorios.
-            </div>
+          <div *ngIf="registroForm.get('name')?.touched && registroForm.get('name')?.invalid" class="text-red-500 text-sm mt-1 font-medium">
+            El nombre completo es obligatorio.
           </div>
         </div>
 
@@ -111,7 +100,7 @@
 
         <!-- Input: Repetir Contraseña -->
         <div>
-          <label for="password_confirmation" class="block text-sm font-bold text-gray-700 tracking-wide mb-2 uppercase">
+          <label for="confirmedPassword" class="block text-sm font-bold text-gray-700 tracking-wide mb-2 uppercase">
             Repetir contraseña
           </label>
           <div class="mt-1 relative rounded-2xl shadow-sm group">
@@ -124,11 +113,11 @@
                   clip-rule="evenodd" />
               </svg>
             </div>
-            <input id="password_confirmation" formControlName="password_confirmation" type="password" autocomplete="new-password"
+            <input id="confirmedPassword" formControlName="confirmedPassword" type="password" autocomplete="new-password"
               class="appearance-none block w-full pl-14 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-0 focus:border-brand-blue text-base text-gray-900 placeholder-gray-400 bg-gray-50/50 focus:bg-white transition-all duration-300"
               placeholder="••••••••">
           </div>
-          <div *ngIf="registroForm.get('password_confirmation')?.touched && registroForm.get('password_confirmation')?.errors?.['passwordsMismatch']" class="text-red-500 text-sm mt-1 font-medium">
+          <div *ngIf="registroForm.get('confirmedPassword')?.touched && registroForm.get('confirmedPassword')?.errors?.['passwordsMismatch']" class="text-red-500 text-sm mt-1 font-medium">
             Las contraseñas no coinciden.
           </div>
         </div>

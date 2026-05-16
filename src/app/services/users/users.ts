@@ -29,7 +29,7 @@ export class Users {
   }
 
   // Registrar un nuevo usuario
-  register(userData: { nombre: string; apellidos: string; email: string; password: string }): Observable<any> {
+  register(userData: any): Observable<any> {
     return this.http.post<any>(`${environment.backendUrl}/local/register`, userData);
   }
 
@@ -56,7 +56,7 @@ export class Users {
   updateUserProfile(name?: string, avatarFile?: File): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    
+
     const formData = new FormData();
     if (name) {
       // Usamos un Blob para el String si es @RequestPart en el back
@@ -65,7 +65,7 @@ export class Users {
     if (avatarFile) {
       formData.append('avatarFile', avatarFile);
     }
-    
+
     return this.http.put<any>(`${this.baseUrl}/profile`, formData, { headers });
   }
 
