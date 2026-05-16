@@ -58,6 +58,8 @@ export class LoginComponent implements OnInit {
               console.log('Respuesta del backend:', response);
               if (response && response.token) {
                 localStorage.setItem('token', response.token);
+                // Cargar perfil para actualizar cabecera
+                this.usersService.getUserProfile().subscribe();
                 this.router.navigate(['/home']);
               } else {
                 this.errorMessage = response?.message || 'El servidor no devolvió un token válido.';
@@ -152,6 +154,8 @@ export class LoginComponent implements OnInit {
               this.zone.run(() => {
                 if (response && response.token) {
                   localStorage.setItem('token', response.token);
+                  // Cargar perfil para actualizar cabecera
+                  this.usersService.getUserProfile().subscribe();
                   window.history.replaceState(null, '', window.location.pathname);
                   this.router.navigate(['/home']);
                 } else {

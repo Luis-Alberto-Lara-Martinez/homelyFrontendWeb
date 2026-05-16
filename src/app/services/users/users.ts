@@ -1,7 +1,6 @@
-// users.service.ts (Ejemplo en Angular)
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -11,7 +10,15 @@ export class Users {
   // Usamos el entorno para que coja http://localhost:8080/api/user
   private baseUrl = environment.backendUrl + '/api/user';
 
+  // Estado global del usuario
+  private userSubject = new BehaviorSubject<any>(null);
+  public user$ = this.userSubject.asObservable();
+
   constructor(private http: HttpClient) {
+  }
+
+  clearCurrentUser() {
+    this.userSubject.next(null);
   }
 
   // 1. Añadimos método para Iniciar Sesión usando la ruta del backend
@@ -49,7 +56,9 @@ export class Users {
   getUserProfile(): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any>(`${this.baseUrl}/profile`, { headers });
+    return this.http.get<any>(`${this.baseUrl}/profile`, { headers }).pipe(
+      tap(user => this.userSubject.next(user))
+    );
   }
 
   // Actualizar perfil (PUT /api/user/profile)
@@ -66,7 +75,9 @@ export class Users {
       formData.append('avatarFile', avatarFile);
     }
 
-    return this.http.put<any>(`${this.baseUrl}/profile`, formData, { headers });
+    return this.http.put<any>(`${this.baseUrl}/profile`, formData, { headers }).pipe(
+      tap(user => this.userSubject.next(user))
+    );
   }
 
   // Cambiar contraseña (PUT /api/user/password)

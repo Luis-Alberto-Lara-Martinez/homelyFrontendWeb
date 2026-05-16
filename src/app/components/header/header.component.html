@@ -35,14 +35,20 @@
           <!-- Dropdown Mi Cuenta -->
           <div class="relative">
             <button (click)="toggleDropdown()" 
-              class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-brand-dark px-4 py-2 rounded-full font-medium transition-all active:scale-95">
-              <div class="w-8 h-8 bg-brand-blue/10 rounded-full flex items-center justify-center text-brand-blue">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+              class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-brand-dark p-1.5 rounded-full font-medium transition-all active:scale-95 shadow-sm hover:shadow-md">
+              <div class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 border border-white bg-brand-blue/5 shadow-inner">
+                <img *ngIf="user?.imageUrl; else defaultIcon" [src]="user.imageUrl" 
+                  class="w-full h-full object-cover" 
+                  alt="Avatar">
+                <ng-template #defaultIcon>
+                  <div class="w-full h-full flex items-center justify-center text-brand-blue">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                </ng-template>
               </div>
-              <span>Mi Perfil</span>
-              <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="dropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-gray-400 mr-1.5 transition-transform duration-200" [class.rotate-180]="dropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>

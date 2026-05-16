@@ -65,6 +65,8 @@ export class RegistroComponent {
           next: (response) => {
             if (response && response.token) {
               localStorage.setItem('token', response.token);
+              // Cargar perfil para actualizar cabecera
+              this.usersService.getUserProfile().subscribe();
               this.router.navigate(['/home']);
             } else {
               this.router.navigate(['/login']);
