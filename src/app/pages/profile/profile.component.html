@@ -19,11 +19,13 @@
                             
                             <!-- Overlay para subir foto -->
                             <label class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg *ngIf="!isSavingProfile" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <input type="file" class="hidden" (change)="onFileSelected($event)" accept="image/*">
+                                <!-- Spinner mientras sube -->
+                                <div *ngIf="isSavingProfile" class="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+                                <input type="file" class="hidden" (change)="onFileSelected($event)" accept="image/*" [disabled]="isSavingProfile">
                             </label>
                         </div>
                         <h2 class="mt-4 text-xl font-bold text-brand-dark">{{user?.name}}</h2>
@@ -200,6 +202,49 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+    <!-- Notificación Pop-up (Toast) -->
+    <div *ngIf="showToast" 
+         class="fixed top-24 right-8 z-[100] animate-in slide-in-from-right-full duration-500">
+        <div [ngClass]="{
+                'bg-white border-green-100 text-green-800 shadow-green-100/50': toastType === 'success',
+                'bg-white border-red-100 text-red-800 shadow-red-100/50': toastType === 'error',
+                'bg-white border-brand-blue/20 text-brand-blue shadow-brand-blue/10': toastType === 'loading'
+             }"
+             class="flex items-center gap-4 p-5 rounded-2xl border shadow-2xl min-w-[320px]">
+            
+            <!-- Icono Éxito -->
+            <div *ngIf="toastType === 'success'" class="flex-shrink-0 w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+
+            <!-- Icono Error -->
+            <div *ngIf="toastType === 'error'" class="flex-shrink-0 w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center text-red-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </div>
+
+            <!-- Icono Carga -->
+            <div *ngIf="toastType === 'loading'" class="flex-shrink-0 w-12 h-12 bg-brand-blue/5 rounded-xl flex items-center justify-center text-brand-blue">
+                <div class="animate-spin rounded-full h-6 w-6 border-2 border-brand-blue border-t-transparent"></div>
+            </div>
+
+            <div class="flex-grow">
+                <p class="text-sm font-black uppercase tracking-wider mb-0.5">
+                    {{ toastType === 'success' ? 'Completado' : (toastType === 'error' ? 'Error' : 'Procesando') }}
+                </p>
+                <p class="text-sm font-medium opacity-80">{{ toastMessage }}</p>
+            </div>
+
+            <button (click)="showToast = false" class="text-gray-400 hover:text-gray-600 p-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
     </div>
 </div>

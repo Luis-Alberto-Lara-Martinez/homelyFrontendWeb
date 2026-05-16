@@ -148,12 +148,15 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  // Notificaciones (Pop-up)
+  showToast: boolean = false;
+  toastMessage: string = '';
+  toastType: 'success' | 'error' | 'loading' = 'success';
+
   toggleEditProfile(): void {
     this.isEditingProfile = !this.isEditingProfile;
     if (this.isEditingProfile) {
       this.editName = this.user?.name || '';
-      this.profileSuccessMessage = '';
-      this.profileErrorMessage = '';
     } else {
       this.selectedFile = null;
       this.avatarPreview = null;
@@ -168,23 +171,45 @@ export class ProfileComponent implements OnInit {
       reader.onload = () => {
         this.avatarPreview = reader.result as string;
         this.cdr.detectChanges();
+        // Subida automática al seleccionar imagen
+        this.onUpdateProfile(true);
       };
       reader.readAsDataURL(file);
     }
   }
 
-  onUpdateProfile(): void {
-    if (!this.editName.trim() && !this.selectedFile) return;
+  private showNotification(message: string, type: 'success' | 'error' | 'loading' = 'success'): void {
+    this.zone.run(() => {
+      this.toastMessage = message;
+      this.toastType = type;
+      this.showToast = true;
+      this.cdr.detectChanges();
+      
+      // Si es carga, no lo cerramos automáticamente (esperamos al resultado)
+      if (type !== 'loading') {
+        setTimeout(() => {
+          this.showToast = false;
+          this.cdr.detectChanges();
+        }, 4000);
+      }
+    });
+  }
+
+  onUpdateProfile(isAvatarOnly: boolean = false): void {
+    const nameToSave = isAvatarOnly ? undefined : this.editName;
+    const fileToSave = this.selectedFile || undefined;
+
+    if (!nameToSave && !fileToSave) return;
 
     this.isSavingProfile = true;
-    this.profileSuccessMessage = '';
-    this.profileErrorMessage = '';
-
-    this.usersService.updateUserProfile(this.editName, this.selectedFile || undefined)
+    this.showNotification('Actualizando perfil, espera un momento...', 'loading');
+    
+    this.usersService.updateUserProfile(nameToSave, fileToSave)
       .pipe(
         finalize(() => {
           this.zone.run(() => {
             this.isSavingProfile = false;
+            this.selectedFile = null;
             this.cdr.detectChanges();
           });
         })
@@ -194,19 +219,16 @@ export class ProfileComponent implements OnInit {
           this.zone.run(() => {
             this.user = updatedUser;
             this.isEditingProfile = false;
-            this.profileSuccessMessage = 'Perfil actualizado correctamente.';
-            this.selectedFile = null;
             this.avatarPreview = null;
-            setTimeout(() => {
-              this.profileSuccessMessage = '';
-              this.cdr.detectChanges();
-            }, 3000);
+            this.showNotification('¡Perfil actualizado con éxito!', 'success');
           });
         },
         error: (err) => {
           this.zone.run(() => {
             console.error('Error al actualizar perfil:', err);
-            this.profileErrorMessage = 'No se pudo actualizar el perfil.';
+            const errorMsg = err.error?.message || 'No se pudo actualizar el perfil.';
+            this.showNotification(errorMsg, 'error');
+            this.avatarPreview = null;
           });
         }
       });
