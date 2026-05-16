@@ -83,8 +83,8 @@ export class Users {
 
     // Extraemos el rol. Dependiendo de tu back, puede estar en 'role', 'roles' o 'sub'
     const role = payload.role || payload.roles || payload.authorities;
-    
-    const isAdminRole = Array.isArray(role) 
+
+    const isAdminRole = Array.isArray(role)
       ? role.some(r => r.toLowerCase() === 'admin')
       : (typeof role === 'string' && role.toLowerCase() === 'admin');
 
@@ -118,9 +118,20 @@ export class Users {
   }
 
   // Obtener todos los usuarios (para admin, GET /admin/users - si está habilitado)
-  getAllUsers(): Observable<any[]> {
+  getAllUsers(page: number, size: number): Observable<any[]> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any[]>(`${this.baseUrl}/admin/users`, { headers });
+    return this.http.post<any[]>(`${environment.backendUrl}/admin/users`, { "page": page, "size": size }, { headers });
   }
+
+  // Delete user (para admin, DELETE /admin/user/{id} - si está habilitado)
+  deleteUser(id: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.delete<any>(`${environment.backendUrl}/admin/user`, {
+      headers: headers,
+      body: { id: id }
+    });
+  }
+
 }
