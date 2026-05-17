@@ -48,9 +48,12 @@ interface Property {
           <div class="lg:col-span-2 space-y-8">
             
             <!-- Galería de Imágenes Principal -->
-            <div class="relative rounded-3xl overflow-hidden shadow-2xl group">
-              <img [src]="property?.images?.[0]" class="w-full h-[500px] object-cover transition-transform duration-700 group-hover:scale-105">
-              <div class="absolute top-6 left-6 flex gap-2">
+            <div class="relative rounded-3xl overflow-hidden shadow-2xl group select-none">
+              <!-- Main Image -->
+              <img [src]="property?.images?.[activeImageIndex]" class="w-full h-[500px] object-cover transition-all duration-500 ease-in-out transform group-hover:scale-102">
+              
+              <!-- Badges -->
+              <div class="absolute top-6 left-6 flex gap-2 z-10">
                 <span class="bg-brand-blue text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg">
                   {{ property?.status }}
                 </span>
@@ -58,6 +61,38 @@ interface Property {
                   {{ property?.type }}
                 </span>
               </div>
+
+              <!-- Image Counter badge -->
+              <div *ngIf="(property?.images?.length || 0) > 1" class="absolute top-6 right-6 bg-brand-dark/75 backdrop-blur-md text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg z-10">
+                {{ activeImageIndex + 1 }} / {{ property?.images?.length }}
+              </div>
+
+              <!-- Navigation Arrows -->
+              <ng-container *ngIf="(property?.images?.length || 0) > 1">
+                <!-- Left Arrow -->
+                <button (click)="prevImage($event)" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white text-brand-dark rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 duration-200 z-10 focus:outline-none cursor-pointer">
+                  <svg class="w-6 h-6 text-brand-dark animate-in fade-in" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                
+                <!-- Right Arrow -->
+                <button (click)="nextImage($event)" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white text-brand-dark rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 duration-200 z-10 focus:outline-none cursor-pointer">
+                  <svg class="w-6 h-6 text-brand-dark animate-in fade-in" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
+                </button>
+              </ng-container>
+
+              <!-- Progress Dots overlay at the bottom -->
+              <div *ngIf="(property?.images?.length || 0) > 1" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10 bg-brand-dark/30 px-4 py-2.5 rounded-full backdrop-blur-sm">
+                <button *ngFor="let img of property?.images; let idx = index" (click)="selectImage(idx, $event)" class="w-2.5 h-2.5 rounded-full transition-all duration-300 focus:outline-none cursor-pointer" [class.bg-white]="activeImageIndex === idx" [class.scale-125]="activeImageIndex === idx" [class.bg-white/40]="activeImageIndex !== idx"></button>
+              </div>
+            </div>
+
+            <!-- Thumbnail list beneath the main image -->
+            <div *ngIf="(property?.images?.length || 0) > 1" class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin select-none">
+              <button *ngFor="let img of property?.images; let idx = index" (click)="selectImage(idx, $event)" class="relative w-24 h-16 rounded-xl overflow-hidden flex-shrink-0 transition-all duration-300 focus:outline-none border-2 shadow-sm hover:scale-105 active:scale-95 cursor-pointer" [class.border-brand-blue]="activeImageIndex === idx" [class.border-transparent]="activeImageIndex !== idx" [class.shadow-md]="activeImageIndex === idx">
+                <img [src]="img" class="w-full h-full object-cover">
+                <!-- Overlay to dim inactive thumbnails -->
+                <div *ngIf="activeImageIndex !== idx" class="absolute inset-0 bg-brand-dark/15 hover:bg-transparent transition-colors"></div>
+              </button>
             </div>
 
             <!-- Información General -->
@@ -191,11 +226,33 @@ interface Property {
 export class PropertyDetailsComponent implements OnInit {
   property: Property | null = null;
   propertiesLink: string = '/propiedades';
+  activeImageIndex: number = 0;
 
   constructor(
     private route: ActivatedRoute,
     private propertiesService: Properties
   ) { }
+
+  prevImage(event: Event) {
+    event.stopPropagation();
+    if (this.property && this.property.images) {
+      const len = this.property.images.length;
+      this.activeImageIndex = (this.activeImageIndex - 1 + len) % len;
+    }
+  }
+
+  nextImage(event: Event) {
+    event.stopPropagation();
+    if (this.property && this.property.images) {
+      const len = this.property.images.length;
+      this.activeImageIndex = (this.activeImageIndex + 1) % len;
+    }
+  }
+
+  selectImage(index: number, event: Event) {
+    event.stopPropagation();
+    this.activeImageIndex = index;
+  }
 
   ngOnInit(): void {
     // Escuchar parámetros de búsqueda para actualizar dinámicamente el enlace del Breadcrumb
@@ -388,6 +445,7 @@ export class PropertyDetailsComponent implements OnInit {
           image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1376&auto=format&fit=crop'
         }
       };
+      this.activeImageIndex = 0;
     } catch (err) {
       console.error('Homely Detail Page - Error mapeando datos del objeto de búsqueda:', err);
       this.loadFallbackMock(Number(data?.id || 0));
@@ -426,6 +484,7 @@ export class PropertyDetailsComponent implements OnInit {
         image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1376&auto=format&fit=crop'
       }
     };
+    this.activeImageIndex = 0;
   }
 }
 
