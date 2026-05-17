@@ -134,4 +134,42 @@ export class Users {
     });
   }
 
+  getAllRoles(): Observable<any[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${environment.backendUrl}/admin/user/roles`, { headers });
+  }
+
+  getAllStatuses(): Observable<any[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${environment.backendUrl}/admin/user/statuses`, { headers });
+  }
+
+  updateUserRole(userEmail: string, role: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put<any>(`${environment.backendUrl}/admin/user/role`, { "email": userEmail, "role": role }, { headers });
+  }
+
+  updateUserStatus(userEmail: string, status: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put<any>(`${environment.backendUrl}/admin/user/status`, { "email": userEmail, "status": status }, { headers });
+  }
+
+  postUser(name: string, email: string, role: string, status: string, password: string, confirmedPassword: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${environment.backendUrl}/admin/user`, { "name": name, "email": email, "role": role, "status": status, "password": password, "confirmedPassword": confirmedPassword }, { headers });
+  }
+
+  getUser(email: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any>(`${environment.backendUrl}/admin/user`, {
+      headers: headers,
+      params: { "email": email }
+    });
+  }
 }
