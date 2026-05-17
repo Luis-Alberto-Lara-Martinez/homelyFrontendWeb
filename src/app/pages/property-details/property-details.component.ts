@@ -225,13 +225,28 @@ interface Property {
         </button>
 
         <!-- Main Image Container -->
-        <div class="relative max-w-5xl max-h-[80vh] w-full px-4 flex items-center justify-center" (click)="$event.stopPropagation()">
+        <div class="relative max-w-5xl max-h-[80vh] w-full px-4 flex items-center justify-center overflow-hidden" (click)="$event.stopPropagation()">
           
           <!-- Large Image inside Modal -->
-          <img [src]="property?.images?.[activeImageIndex]" class="max-w-full max-h-[80vh] rounded-3xl shadow-2xl border border-white/10 object-contain cursor-default select-all animate-img-zoom transition-all duration-300 ease-in-out transform" [class.opacity-40]="isAnimating" [class.scale-95]="isAnimating">
+          <img [src]="property?.images?.[activeImageIndex]" 
+               (click)="toggleZoom($event)"
+               (mousedown)="startDrag($event)"
+               (mousemove)="onDrag($event)"
+               (mouseup)="endDrag()"
+               (mouseleave)="endDrag()"
+               class="max-w-full max-h-[80vh] rounded-3xl shadow-2xl border border-white/10 object-contain transform select-none" 
+               [class.transition-transform]="!isDragging"
+               [class.duration-300]="!isDragging"
+               [class.ease-out]="!isDragging"
+               [class.cursor-zoom-in]="zoomLevel === 1"
+               [class.cursor-grab]="zoomLevel > 1 && !isDragging"
+               [class.cursor-grabbing]="zoomLevel > 1 && isDragging"
+               [class.opacity-40]="isAnimating" 
+               [style.transform]="'translate3d(' + translateX + 'px, ' + translateY + 'px, 0px) scale(' + zoomLevel + ')'"
+               [class.scale-95]="isAnimating && zoomLevel === 1">
 
           <!-- Navigation inside Lightbox -->
-          <ng-container *ngIf="(property?.images?.length || 0) > 1">
+          <ng-container *ngIf="(property?.images?.length || 0) > 1 && zoomLevel === 1">
             <!-- Left Arrow inside Lightbox -->
             <button (click)="prevImage($event)" class="absolute left-8 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110 active:scale-95 duration-200 cursor-pointer focus:outline-none backdrop-blur-md border border-white/10">
               <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
@@ -244,8 +259,22 @@ interface Property {
           </ng-container>
         </div>
 
+        <!-- Zoom Pill Controllers -->
+        <div class="mt-4 bg-black/40 backdrop-blur-md px-5 py-2 rounded-full border border-white/10 flex items-center gap-4 text-white z-10 shadow-lg" (click)="$event.stopPropagation()">
+          <button (click)="zoomOut($event)" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-all cursor-pointer focus:outline-none disabled:opacity-40" [disabled]="zoomLevel <= 1" title="Disminuir zoom">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4" /></svg>
+          </button>
+          <span class="text-sm font-bold w-12 text-center">{{ (zoomLevel * 100).toFixed(0) }}%</span>
+          <button (click)="zoomIn($event)" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-all cursor-pointer focus:outline-none disabled:opacity-40" [disabled]="zoomLevel >= 3" title="Aumentar zoom">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
+          </button>
+          <button (click)="resetZoom($event)" class="text-xs font-bold bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-xl transition-all cursor-pointer focus:outline-none" *ngIf="zoomLevel !== 1">
+            Restablecer
+          </button>
+        </div>
+
         <!-- Lightbox Counter / Details -->
-        <div class="mt-6 text-center bg-black/30 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/5 text-white/95 shadow-xl" (click)="$event.stopPropagation()">
+        <div class="mt-4 text-center bg-black/30 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/5 text-white/95 shadow-xl" (click)="$event.stopPropagation()">
           <h4 class="font-bold text-lg tracking-tight">{{ property?.title }}</h4>
           <p class="text-white/60 text-xs font-semibold mt-1 uppercase tracking-widest">Imagen {{ activeImageIndex + 1 }} de {{ property?.images?.length }}</p>
         </div>
@@ -279,6 +308,14 @@ export class PropertyDetailsComponent implements OnInit {
   isLightboxOpen: boolean = false;
   isAnimating: boolean = false;
 
+  // Estados de Zoom y Arrastre (Panning)
+  zoomLevel: number = 1;
+  isDragging: boolean = false;
+  startX: number = 0;
+  startY: number = 0;
+  translateX: number = 0;
+  translateY: number = 0;
+
   constructor(
     private route: ActivatedRoute,
     private propertiesService: Properties
@@ -287,11 +324,13 @@ export class PropertyDetailsComponent implements OnInit {
   openLightbox() {
     this.isLightboxOpen = true;
     document.body.style.overflow = 'hidden';
+    this.resetZoom();
   }
 
   closeLightbox() {
     this.isLightboxOpen = false;
     document.body.style.overflow = '';
+    this.resetZoom();
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -314,11 +353,66 @@ export class PropertyDetailsComponent implements OnInit {
     }, 150);
   }
 
+  // Métodos de control del Zoom
+  zoomIn(event: Event) {
+    event.stopPropagation();
+    this.zoomLevel = Math.min(3, this.zoomLevel + 0.25);
+  }
+
+  zoomOut(event: Event) {
+    event.stopPropagation();
+    this.zoomLevel = Math.max(1, this.zoomLevel - 0.25);
+    if (this.zoomLevel === 1) {
+      this.translateX = 0;
+      this.translateY = 0;
+    }
+  }
+
+  resetZoom(event?: Event) {
+    if (event) event.stopPropagation();
+    this.zoomLevel = 1;
+    this.translateX = 0;
+    this.translateY = 0;
+    this.isDragging = false;
+  }
+
+  toggleZoom(event: Event) {
+    event.stopPropagation();
+    if (this.zoomLevel === 1) {
+      this.zoomLevel = 2;
+    } else {
+      this.resetZoom();
+    }
+  }
+
+  // Métodos de control del arrastre (Panning)
+  startDrag(event: MouseEvent) {
+    if (this.zoomLevel > 1) {
+      event.preventDefault();
+      this.isDragging = true;
+      this.startX = event.clientX - this.translateX;
+      this.startY = event.clientY - this.translateY;
+    }
+  }
+
+  onDrag(event: MouseEvent) {
+    if (this.isDragging && this.zoomLevel > 1) {
+      event.preventDefault();
+      this.translateX = event.clientX - this.startX;
+      this.translateY = event.clientY - this.startY;
+    }
+  }
+
+  endDrag() {
+    this.isDragging = false;
+  }
+
   prevImage(event: Event) {
     event.stopPropagation();
     if (this.property && this.property.images) {
       const len = this.property.images.length;
       this.activeImageIndex = (this.activeImageIndex - 1 + len) % len;
+      this.resetZoom();
       this.animateImageChange();
     }
   }
@@ -328,6 +422,7 @@ export class PropertyDetailsComponent implements OnInit {
     if (this.property && this.property.images) {
       const len = this.property.images.length;
       this.activeImageIndex = (this.activeImageIndex + 1) % len;
+      this.resetZoom();
       this.animateImageChange();
     }
   }
@@ -336,6 +431,7 @@ export class PropertyDetailsComponent implements OnInit {
     event.stopPropagation();
     if (this.activeImageIndex !== index) {
       this.activeImageIndex = index;
+      this.resetZoom();
       this.animateImageChange();
     }
   }
