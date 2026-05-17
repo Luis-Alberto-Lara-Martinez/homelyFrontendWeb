@@ -1,0 +1,53 @@
+<div class="pt-20 bg-slate-50 min-h-screen" id="search-results-top">
+  
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-brand-blue"></div>
+    </div>
+
+    <!-- Results Badge -->
+    <div *ngIf="!isLoading && hasValidCoords" class="bg-white/80 backdrop-blur-md border border-brand-blue/10 rounded-[2rem] p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 shadow-[0_15px_40px_-20px_rgba(37,99,235,0.08)] animate-in fade-in slide-in-from-top-4 duration-500">
+      <div class="flex items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-brand-blue/10 flex items-center justify-center text-brand-blue shrink-0">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </div>
+        <div>
+          <span class="inline-block text-[10px] font-black uppercase tracking-widest text-brand-blue bg-brand-blue/10 px-3 py-1 rounded-full">Resultados de Búsqueda</span>
+          <h2 class="text-xl font-extrabold text-brand-dark mt-1 font-sans">
+            Hemos encontrado {{propertiesList.length}} {{propertiesList.length === 1 ? 'propiedad' : 'propiedades'}} dentro del radio puesto en {{searchRadiusKm}} Km
+          </h2>
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-1">
+            Búsqueda de propiedades realizada con éxito en base a tu selección geográfica.
+          </p>
+        </div>
+      </div>
+      <button (click)="goToCatalog()" 
+        class="w-full sm:w-auto px-6 py-4 rounded-xl bg-gradient-to-r from-brand-blue to-blue-600 text-white text-xs font-bold uppercase tracking-widest shadow-lg shadow-brand-blue/30 hover:shadow-brand-blue/40 transition-all active:scale-95 flex items-center justify-center gap-2">
+        Ir al catálogo completo
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+      </button>
+    </div>
+
+    <!-- Invalid Coords Error -->
+    <div *ngIf="!isLoading && !hasValidCoords" class="bg-red-50 border border-red-100 rounded-[2rem] p-8 text-center animate-in fade-in">
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+      </div>
+      <h2 class="text-xl font-extrabold text-red-800 mb-2">Búsqueda inválida</h2>
+      <p class="text-red-600 mb-6 font-medium">No se han proporcionado coordenadas válidas para buscar propiedades por zona.</p>
+      <button (click)="goToCatalog()" class="px-8 py-4 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 shadow-lg hover:shadow-xl transition-all">Ver catálogo general</button>
+    </div>
+  </div>
+
+  <div class="mt-4" *ngIf="!isLoading && hasValidCoords">
+    <app-featured-properties [properties]="propertiesList"></app-featured-properties>
+  </div>
+  
+  <div class="mt-20">
+    <app-cta-banner></app-cta-banner>
+  </div>
+</div>

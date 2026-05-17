@@ -23,57 +23,35 @@ export class PropertiesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      const lat = params['lat'];
-      const lng = params['lng'];
-      const rad = params['rad'];
-
-      if (lat && lng) {
-        this.isSearchFiltered = true;
-        this.searchRadiusKm = Number(rad) || 2;
-        this.loadPropertiesWithinRadius(Number(lat), Number(lng), this.searchRadiusKm);
-
-        // Desplazarse suavemente y de forma directa a los resultados
-        setTimeout(() => {
-          const element = document.getElementById('propiedades');
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 300);
-      } else {
-        this.isSearchFiltered = false;
-        this.loadAllProperties();
+    // Como esta página ahora es solo para el catálogo completo, 
+    // cargamos directamente todas las propiedades.
+    this.loadAllProperties();
+    
+    // Desplazarse suavemente al inicio
+    setTimeout(() => {
+      const element = document.getElementById('propiedades');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    });
-  }
-
-  loadPropertiesWithinRadius(lat: number, lng: number, rad: number) {
-    this.propertiesService.getPropertiesWithinRadius(lat, lng, rad).subscribe({
-      next: (data: any[]) => {
-        this.propertiesList = data;
-      },
-      error: (err: any) => {
-        console.error('Error loading properties within radius:', err);
-        // Fallback to loading all properties on error
-        this.loadAllProperties();
-      }
-    });
+    }, 300);
   }
 
   loadAllProperties() {
     this.propertiesService.getAllProperties().subscribe({
-      next: (data: any[]) => {
-        this.propertiesList = data;
+      next: (data: any) => {
+        let list: any[] = [];
+        if (Array.isArray(data)) {
+          list = data;
+        } else if (data && Array.isArray(data.data)) {
+          list = data.data;
+        } else if (data && Array.isArray(data.properties)) {
+          list = data.properties;
+        } else if (data && Array.isArray(data.content)) {
+          list = data.content;
+        }
+        this.propertiesList = list;
       },
       error: (err: any) => console.error('Error loading all properties:', err)
-    });
-  }
-
-  clearSearchFilter() {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { lat: null, lng: null, rad: null },
-      queryParamsHandling: 'merge'
     });
   }
 }

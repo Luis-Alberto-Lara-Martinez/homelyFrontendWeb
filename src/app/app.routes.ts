@@ -12,9 +12,16 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { FavoritesComponent } from './pages/favorites/favorites.component';
 import { PropertyDetailsComponent } from './pages/property-details/property-details.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
+import { SearchResultsComponent } from './pages/search-results/search-results.component';
 import { TrabajaConNosotrosComponent } from './pages/trabaja-con-nosotros/trabaja-con-nosotros.component';
 
 export const routes: Routes = [
+  {
+    path: 'resultados-busqueda',
+    component: SearchResultsComponent,
+    canActivate: [authGuard],
+    title: 'Homely - Resultados de Búsqueda'
+  },
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent,

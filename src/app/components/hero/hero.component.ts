@@ -30,22 +30,48 @@ export class HeroComponent {
     private router: Router
   ) {}
 
-  onSearchProperties() {
+  async onSearchProperties() {
     if (this.location.trim() === '') {
       this.selectedLatitude = null;
       this.selectedLongitude = null;
+      this.router.navigate(['/resultados-busqueda']);
+      return;
     }
 
     if (this.selectedLatitude !== null && this.selectedLongitude !== null) {
-      this.router.navigate(['/comprar-alquilar'], {
+      this.router.navigate(['/resultados-busqueda'], {
         queryParams: {
           lat: this.selectedLatitude,
           lng: this.selectedLongitude,
           rad: this.distance
         }
       });
-    } else {
-      this.router.navigate(['/comprar-alquilar']);
+      return;
+    }
+
+    // Geocodificar la dirección ingresada textualmente usando Nominatim
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.location)}&limit=1`);
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        this.selectedLatitude = lat;
+        this.selectedLongitude = lng;
+        this.router.navigate(['/resultados-busqueda'], {
+          queryParams: {
+            lat: lat,
+            lng: lng,
+            rad: this.distance
+          }
+        });
+      } else {
+        // En caso de no encontrar coordenadas, redirigir al catálogo general
+        this.router.navigate(['/resultados-busqueda']);
+      }
+    } catch (err) {
+      console.error('Error geocoding location input:', err);
+      this.router.navigate(['/resultados-busqueda']);
     }
   }
 
