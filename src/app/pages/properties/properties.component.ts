@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Properties } from '../../services/properties/properties';
@@ -19,7 +19,8 @@ export class PropertiesComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private propertiesService: Properties
+    private propertiesService: Properties,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -37,7 +38,9 @@ export class PropertiesComponent implements OnInit {
   }
 
   loadAllProperties() {
-    this.propertiesService.getAllProperties().subscribe({
+    // Consultamos la base de datos con las coordenadas de Madrid y un radio masivo de 5000 Km
+    // para recuperar todas las propiedades de España usando la misma función de radio.
+    this.propertiesService.getPropertiesWithinRadius(40.416775, -3.703790, 5000).subscribe({
       next: (data: any) => {
         let list: any[] = [];
         if (Array.isArray(data)) {
@@ -50,8 +53,12 @@ export class PropertiesComponent implements OnInit {
           list = data.content;
         }
         this.propertiesList = list;
+        this.cdr.detectChanges(); // Forzar actualización de pantalla
       },
-      error: (err: any) => console.error('Error loading all properties:', err)
+      error: (err: any) => {
+        console.error('Error loading all properties:', err);
+        this.cdr.detectChanges();
+      }
     });
   }
 }
