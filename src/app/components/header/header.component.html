@@ -4,8 +4,8 @@
       <!-- Logo -->
       <a routerLink="/" class="flex-shrink-0 flex items-center gap-2 cursor-pointer group">
         <img src="/assets/logos/logo.png" alt="Homely Logo"
-          class="w-10 h-10 object-contain rounded-xl shadow-lg shadow-brand-blue/30 group-hover:scale-105 transition-transform duration-300">
-        <span class="font-bold text-xl text-brand-dark tracking-tight">Homely<span
+          class="w-10 h-10 object-contain rounded-xl shadow-lg shadow-brand-blue/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+        <span class="font-bold text-xl text-brand-dark tracking-tight transition-colors duration-300 group-hover:text-brand-blue">Homely<span
             class="text-brand-blue">.</span></span>
       </a>
 
@@ -13,16 +13,16 @@
       <nav class="hidden lg:flex items-center space-x-1">
         <a routerLink="/home" routerLinkActive="bg-brand-blue/10 !text-brand-blue"
           [routerLinkActiveOptions]="{exact: true}"
-          class="px-4 py-2 rounded-full text-gray-600 font-bold hover:bg-gray-50 transition-all duration-300">Inicio</a>
+          class="px-4 py-2 rounded-full text-gray-600 font-bold hover:text-brand-blue hover:bg-brand-blue/5 hover:scale-105 active:scale-95 hover:shadow-sm hover:shadow-brand-blue/5 transition-all duration-300 ease-out">Inicio</a>
         <a routerLink="/propiedades" routerLinkActive="bg-brand-blue/10 !text-brand-blue"
-          class="px-4 py-2 rounded-full text-gray-600 font-bold hover:bg-gray-50 transition-all duration-300 whitespace-nowrap">Propiedades</a>
+          class="px-4 py-2 rounded-full text-gray-600 font-bold hover:text-brand-blue hover:bg-brand-blue/5 hover:scale-105 active:scale-95 hover:shadow-sm hover:shadow-brand-blue/5 transition-all duration-300 ease-out whitespace-nowrap">Propiedades</a>
         <a routerLink="/vender" routerLinkActive="bg-brand-blue/10 !text-brand-blue"
-          class="px-4 py-2 rounded-full text-gray-600 font-bold hover:bg-gray-50 transition-all duration-300">Vender</a>
+          class="px-4 py-2 rounded-full text-gray-600 font-bold hover:text-brand-blue hover:bg-brand-blue/5 hover:scale-105 active:scale-95 hover:shadow-sm hover:shadow-brand-blue/5 transition-all duration-300 ease-out">Vender</a>
         <a routerLink="/nosotros" routerLinkActive="bg-brand-blue/10 !text-brand-blue"
-          class="px-4 py-2 rounded-full text-gray-600 font-bold hover:bg-gray-50 transition-all duration-300 whitespace-nowrap">Sobre
+          class="px-4 py-2 rounded-full text-gray-600 font-bold hover:text-brand-blue hover:bg-brand-blue/5 hover:scale-105 active:scale-95 hover:shadow-sm hover:shadow-brand-blue/5 transition-all duration-300 ease-out whitespace-nowrap">Sobre
           Nosotros</a>
         <a routerLink="/contacto" routerLinkActive="bg-brand-blue/10 !text-brand-blue"
-          class="px-4 py-2 rounded-full text-gray-600 font-bold hover:bg-gray-50 transition-all duration-300">Contacto</a>
+          class="px-4 py-2 rounded-full text-gray-600 font-bold hover:text-brand-blue hover:bg-brand-blue/5 hover:scale-105 active:scale-95 hover:shadow-sm hover:shadow-brand-blue/5 transition-all duration-300 ease-out">Contacto</a>
 
         <!-- Admin Links -->
         <ng-container *ngIf="usersService.isAdmin()">
@@ -50,7 +50,7 @@
       <div class="hidden lg:flex items-center gap-4">
         <ng-container *ngIf="!usersService.isAuthenticated()">
           <a routerLink="/login"
-            class="bg-gradient-brand hover:opacity-90 active:scale-95 transition-all text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-brand-blue/30 inline-block font-semibold">
+            class="bg-gradient-brand hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-brand-blue/40 transition-all duration-300 text-white px-6 py-2.5 rounded-full font-medium shadow-md shadow-brand-blue/30 inline-block font-semibold">
             Inicio Sesión
           </a>
         </ng-container>
@@ -58,7 +58,7 @@
           <!-- Dropdown Mi Cuenta -->
           <div class="relative">
             <button (click)="toggleDropdown()"
-              class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-brand-dark p-1.5 rounded-full font-medium transition-all active:scale-95 shadow-sm hover:shadow-md">
+              class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-brand-dark p-1.5 rounded-full font-medium transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow-md hover:shadow-brand-blue/5">
               <div
                 class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 border border-white bg-brand-blue/5 shadow-inner">
                 <img *ngIf="user?.imageUrl; else defaultIcon" [src]="user.imageUrl" class="w-full h-full object-cover"
@@ -114,7 +114,7 @@
       <!-- Botones para móvil -->
       <div class="lg:hidden flex items-center">
         <button (click)="toggleMenu()" type="button"
-          class="text-gray-600 hover:text-brand-blue focus:outline-none transition-colors" aria-label="Abrir menú">
+          class="text-gray-600 hover:text-brand-blue focus:outline-none transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer" aria-label="Abrir menú">
           <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
