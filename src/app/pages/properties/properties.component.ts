@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -26,12 +26,77 @@ export class PropertiesComponent implements OnInit {
   filterMaxPrice: number | null = null;
   filterBeds: string = '';
 
+  // Estado para Dropdowns personalizados
+  activeDropdown: string | null = null;
+
+  transactionOptions = [
+    { label: 'Cualquiera', value: '' },
+    { label: 'Venta', value: 'venta' },
+    { label: 'Alquiler', value: 'alquiler' }
+  ];
+
+  typeOptions = [
+    { label: 'Todos los tipos', value: '' },
+    { label: 'Residencia', value: 'residencia' },
+    { label: 'Local Comercial', value: 'local' },
+    { label: 'Oficina', value: 'oficina' },
+    { label: 'Garaje', value: 'garaje' },
+    { label: 'Trastero', value: 'trastero' }
+  ];
+
+  bedsOptions = [
+    { label: 'Cualquiera', value: '' },
+    { label: '1 Habitación', value: '1' },
+    { label: '2 Habitaciones', value: '2' },
+    { label: '3 Habitaciones', value: '3' },
+    { label: '4+ Habitaciones', value: '4' }
+  ];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private propertiesService: Properties,
     private cdr: ChangeDetectorRef
   ) {}
+
+  @HostListener('document:click')
+  onDocumentClick() {
+    // Cerrar cualquier dropdown abierto si se hace clic fuera
+    this.activeDropdown = null;
+  }
+
+  toggleDropdown(dropdownName: string, event: Event) {
+    event.stopPropagation();
+    if (this.activeDropdown === dropdownName) {
+      this.activeDropdown = null;
+    } else {
+      this.activeDropdown = dropdownName;
+    }
+  }
+
+  selectOption(filterName: string, value: string, event: Event) {
+    event.stopPropagation();
+    if (filterName === 'transaction') {
+      this.filterTransaction = value;
+    } else if (filterName === 'type') {
+      this.filterType = value;
+    } else if (filterName === 'beds') {
+      this.filterBeds = value;
+    }
+    this.activeDropdown = null;
+    this.applyFilters();
+  }
+
+  getDisplayValue(filterName: string): string {
+    if (filterName === 'transaction') {
+      return this.transactionOptions.find(o => o.value === this.filterTransaction)?.label || 'Cualquiera';
+    } else if (filterName === 'type') {
+      return this.typeOptions.find(o => o.value === this.filterType)?.label || 'Todos los tipos';
+    } else if (filterName === 'beds') {
+      return this.bedsOptions.find(o => o.value === this.filterBeds)?.label || 'Cualquiera';
+    }
+    return '';
+  }
 
   ngOnInit(): void {
     this.loadAllProperties();

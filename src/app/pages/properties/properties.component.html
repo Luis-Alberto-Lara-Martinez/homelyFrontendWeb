@@ -29,13 +29,21 @@
       <div class="w-full lg:w-auto flex-1 relative">
         <label class="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2.5 ml-2">Transacción</label>
         <div class="relative">
-          <select [(ngModel)]="filterTransaction" (ngModelChange)="applyFilters()" class="w-full appearance-none bg-gray-50 border border-gray-100 text-brand-dark font-semibold rounded-2xl px-5 py-4 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue/50 transition-all cursor-pointer shadow-sm">
-            <option value="">Cualquiera</option>
-            <option value="venta">Venta</option>
-            <option value="alquiler">Alquiler</option>
-          </select>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-brand-blue">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          <button type="button" (click)="toggleDropdown('transaction', $event)" 
+            class="w-full bg-gray-50 border border-gray-100 text-brand-dark font-semibold rounded-2xl px-5 py-4 text-left focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue/50 transition-all cursor-pointer shadow-sm flex items-center justify-between">
+            <span class="truncate" [class.text-brand-blue]="filterTransaction !== ''">{{ getDisplayValue('transaction') }}</span>
+            <svg class="w-4 h-4 text-brand-blue flex-shrink-0 transition-transform duration-200" [class.rotate-180]="activeDropdown === 'transaction'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </button>
+          
+          <!-- Dropdown Transacción -->
+          <div *ngIf="activeDropdown === 'transaction'" 
+            class="absolute top-full left-0 mt-2 w-full min-w-[200px] bg-white rounded-2xl shadow-xl shadow-brand-dark/10 border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+            <button *ngFor="let opt of transactionOptions" (click)="selectOption('transaction', opt.value, $event)"
+              class="w-full text-left px-5 py-3 hover:bg-brand-blue/5 text-sm font-semibold transition-colors flex items-center justify-between"
+              [class.text-brand-blue]="filterTransaction === opt.value" [class.bg-brand-blue/5]="filterTransaction === opt.value">
+              {{ opt.label }}
+              <svg *ngIf="filterTransaction === opt.value" class="w-4 h-4 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            </button>
           </div>
         </div>
       </div>
@@ -44,16 +52,21 @@
       <div class="w-full lg:w-auto flex-1 relative">
         <label class="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2.5 ml-2">Tipo de Inmueble</label>
         <div class="relative">
-          <select [(ngModel)]="filterType" (ngModelChange)="applyFilters()" class="w-full appearance-none bg-gray-50 border border-gray-100 text-brand-dark font-semibold rounded-2xl px-5 py-4 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue/50 transition-all cursor-pointer shadow-sm">
-            <option value="">Todos los tipos</option>
-            <option value="residencia">Residencia</option>
-            <option value="local">Local Comercial</option>
-            <option value="oficina">Oficina</option>
-            <option value="garaje">Garaje</option>
-            <option value="trastero">Trastero</option>
-          </select>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-brand-blue">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          <button type="button" (click)="toggleDropdown('type', $event)" 
+            class="w-full bg-gray-50 border border-gray-100 text-brand-dark font-semibold rounded-2xl px-5 py-4 text-left focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue/50 transition-all cursor-pointer shadow-sm flex items-center justify-between">
+            <span class="truncate" [class.text-brand-blue]="filterType !== ''">{{ getDisplayValue('type') }}</span>
+            <svg class="w-4 h-4 text-brand-blue flex-shrink-0 transition-transform duration-200" [class.rotate-180]="activeDropdown === 'type'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </button>
+          
+          <!-- Dropdown Tipo -->
+          <div *ngIf="activeDropdown === 'type'" 
+            class="absolute top-full left-0 mt-2 w-full min-w-[200px] bg-white rounded-2xl shadow-xl shadow-brand-dark/10 border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+            <button *ngFor="let opt of typeOptions" (click)="selectOption('type', opt.value, $event)"
+              class="w-full text-left px-5 py-3 hover:bg-brand-blue/5 text-sm font-semibold transition-colors flex items-center justify-between"
+              [class.text-brand-blue]="filterType === opt.value" [class.bg-brand-blue/5]="filterType === opt.value">
+              {{ opt.label }}
+              <svg *ngIf="filterType === opt.value" class="w-4 h-4 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            </button>
           </div>
         </div>
       </div>
@@ -78,15 +91,21 @@
       <div class="w-full lg:w-auto flex-1 relative">
         <label class="text-[11px] font-bold text-gray-400 uppercase tracking-widest block mb-2.5 ml-2">Habitaciones</label>
         <div class="relative">
-          <select [(ngModel)]="filterBeds" (ngModelChange)="applyFilters()" class="w-full appearance-none bg-gray-50 border border-gray-100 text-brand-dark font-semibold rounded-2xl px-5 py-4 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue/50 transition-all cursor-pointer shadow-sm">
-            <option value="">Cualquiera</option>
-            <option value="1">1 Habitación</option>
-            <option value="2">2 Habitaciones</option>
-            <option value="3">3 Habitaciones</option>
-            <option value="4">4+ Habitaciones</option>
-          </select>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-brand-blue">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          <button type="button" (click)="toggleDropdown('beds', $event)" 
+            class="w-full bg-gray-50 border border-gray-100 text-brand-dark font-semibold rounded-2xl px-5 py-4 text-left focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue/50 transition-all cursor-pointer shadow-sm flex items-center justify-between">
+            <span class="truncate" [class.text-brand-blue]="filterBeds !== ''">{{ getDisplayValue('beds') }}</span>
+            <svg class="w-4 h-4 text-brand-blue flex-shrink-0 transition-transform duration-200" [class.rotate-180]="activeDropdown === 'beds'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </button>
+          
+          <!-- Dropdown Habitaciones -->
+          <div *ngIf="activeDropdown === 'beds'" 
+            class="absolute top-full left-0 mt-2 w-full min-w-[200px] bg-white rounded-2xl shadow-xl shadow-brand-dark/10 border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+            <button *ngFor="let opt of bedsOptions" (click)="selectOption('beds', opt.value, $event)"
+              class="w-full text-left px-5 py-3 hover:bg-brand-blue/5 text-sm font-semibold transition-colors flex items-center justify-between"
+              [class.text-brand-blue]="filterBeds === opt.value" [class.bg-brand-blue/5]="filterBeds === opt.value">
+              {{ opt.label }}
+              <svg *ngIf="filterBeds === opt.value" class="w-4 h-4 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            </button>
           </div>
         </div>
       </div>
