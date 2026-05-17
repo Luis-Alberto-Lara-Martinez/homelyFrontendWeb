@@ -103,7 +103,7 @@ interface FavoriteProperty {
             </div>
             <h2 class="text-2xl font-bold text-gray-900 mb-2">Tu lista está vacía</h2>
             <p class="text-gray-500 mb-8 max-w-sm mx-auto">Parece que aún no has guardado ninguna propiedad. ¡Explora nuestro catálogo y guarda las que más te gusten!</p>
-            <a routerLink="/comprar-alquilar" class="inline-flex items-center gap-2 bg-brand-blue text-white px-8 py-4 rounded-2xl font-bold hover:opacity-90 transition-all shadow-lg shadow-brand-blue/30 active:scale-95">
+            <a routerLink="/propiedades" class="inline-flex items-center gap-2 bg-brand-blue text-white px-8 py-4 rounded-2xl font-bold hover:opacity-90 transition-all shadow-lg shadow-brand-blue/30 active:scale-95">
               Explorar Propiedades
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </a>

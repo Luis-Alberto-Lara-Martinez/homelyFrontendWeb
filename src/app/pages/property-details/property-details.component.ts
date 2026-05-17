@@ -190,7 +190,7 @@ interface Property {
 })
 export class PropertyDetailsComponent implements OnInit {
   property: Property | null = null;
-  propertiesLink: string = '/comprar-alquilar';
+  propertiesLink: string = '/propiedades';
 
   constructor(
     private route: ActivatedRoute,
@@ -205,7 +205,7 @@ export class PropertyDetailsComponent implements OnInit {
       if (lat && lng) {
         this.propertiesLink = '/resultados-busqueda';
       } else {
-        this.propertiesLink = '/comprar-alquilar';
+        this.propertiesLink = '/propiedades';
       }
     });
 

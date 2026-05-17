@@ -81,6 +81,6 @@ export class SearchResultsComponent implements OnInit {
   }
 
   goToCatalog() {
-    this.router.navigate(['/comprar-alquilar']);
+    this.router.navigate(['/propiedades']);
   }
 }

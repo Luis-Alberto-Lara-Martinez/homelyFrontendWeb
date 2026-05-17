@@ -82,10 +82,10 @@ export const routes: Routes = [
     title: 'Homely - Encuentra tu hogar ideal'
   },
   {
-    path: 'comprar-alquilar',
+    path: 'propiedades',
     component: PropertiesComponent,
     canActivate: [authGuard], // ← Protegida
-    title: 'Homely - Comprar/Alquilar'
+    title: 'Homely - Propiedades'
   },
   {
     path: 'nosotros',
