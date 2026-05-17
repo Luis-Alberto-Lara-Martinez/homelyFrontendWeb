@@ -190,7 +190,7 @@ interface Property {
 export class PropertyDetailsComponent implements OnInit {
   property: Property | null = null;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
