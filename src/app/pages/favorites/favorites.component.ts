@@ -86,7 +86,7 @@ interface FavoriteProperty {
               </div>
 
               <!-- Botón Ver Detalles -->
-              <a [routerLink]="['/comprar-alquilar']" class="mt-4 block w-full bg-gray-900 text-white text-center py-3.5 rounded-xl font-bold hover:bg-brand-blue transition-all active:scale-95 shadow-lg shadow-gray-200">
+              <a [routerLink]="['/propiedad', prop.id]" [state]="{ property: prop }" class="mt-4 block w-full bg-gray-900 text-white text-center py-3.5 rounded-xl font-bold hover:bg-brand-blue transition-all active:scale-95 shadow-lg shadow-gray-200">
                 Ver Propiedad
               </a>
             </div>
@@ -162,9 +162,9 @@ export class FavoritesComponent implements OnInit {
     }
   ];
 
-  constructor(public usersService: Users) {}
+  constructor(public usersService: Users) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   removeFavorite(id: number): void {
     this.favorites = this.favorites.filter(p => p.id !== id);

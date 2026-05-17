@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { Properties } from '../../services/properties/properties';
 
 interface Property {
   id: number;
@@ -190,13 +191,200 @@ interface Property {
 export class PropertyDetailsComponent implements OnInit {
   property: Property | null = null;
 
-  constructor(private route: ActivatedRoute) { }
+  constructor(
+    private route: ActivatedRoute,
+    private propertiesService: Properties
+  ) { }
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    // Simulamos la carga de datos
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        // Opción 1: Obtener directamente del estado de navegación del router (history.state)
+        // Este estado contiene el objeto JSON completo de la búsqueda y evita hacer llamadas extra
+        const stateData = window.history.state?.property;
+        console.log('Homely Detail Page - Received ID:', id, 'State Data:', stateData);
+        
+        if (stateData && Number(stateData.id) === Number(id)) {
+          console.log('Homely Detail Page - Usando datos del estado de navegación (búsqueda anterior)!');
+          this.mapPropertyData(stateData);
+          return;
+        }
+
+        // Opción 2: Buscar en la caché de los últimos resultados de búsqueda del servicio Properties
+        const cachedProperty = this.propertiesService.latestResults?.find((p: any) => p && Number(p.id) === Number(id));
+        if (cachedProperty) {
+          console.log('Homely Detail Page - Encontrado en caché de resultados de búsqueda del servicio!');
+          this.mapPropertyData(cachedProperty);
+          return;
+        }
+
+        // Opción 3: Llamar de respaldo a getAllProperties() para recargas directas o URLs compartidas
+        console.log('Homely Detail Page - Buscando en la lista completa del backend de respaldo...');
+        this.propertiesService.getAllProperties().subscribe({
+          next: (properties: any) => {
+            try {
+              let list: any[] = [];
+              if (Array.isArray(properties)) {
+                list = properties;
+              } else if (properties && Array.isArray(properties.data)) {
+                list = properties.data;
+              } else if (properties && Array.isArray(properties.properties)) {
+                list = properties.properties;
+              } else if (properties && Array.isArray(properties.content)) {
+                list = properties.content;
+              }
+
+              const found = list.find((p: any) => p && Number(p.id) === Number(id));
+              if (found) {
+                console.log('Homely Detail Page - Encontrado en la lista del backend cargada en segundo plano!');
+                this.mapPropertyData(found);
+              } else {
+                console.warn(`Homely Detail Page - ID ${id} no encontrado en el listado. Cargando fallback simulado.`);
+                this.loadFallbackMock(Number(id));
+              }
+            } catch (err) {
+              console.error('Homely Detail Page - Excepción parseando respuesta del backend:', err);
+              this.loadFallbackMock(Number(id));
+            }
+          },
+          error: (err: any) => {
+            console.warn('Homely Detail Page - Error al obtener listado completo, cargando fallback simulado:', err);
+            this.loadFallbackMock(Number(id));
+          }
+        });
+      }
+    });
+  }
+
+  private mapPropertyData(data: any): void {
+    try {
+      // Formateador de imágenes
+      const formatImageUrl = (url: string): string => {
+        if (!url) return url;
+        const targetBase = 'https://res.cloudinary.com/homely-cloudinary/image/upload/';
+        if (url.startsWith(targetBase) && !url.includes('homely/properties/')) {
+          const pathPart = url.substring(targetBase.length);
+          const match = pathPart.match(/^(v\d+\/)?(.+)$/);
+          if (match) {
+            const version = match[1] || '';
+            const filename = match[2];
+            return `${targetBase}${version}homely/properties/${filename}`;
+          }
+        }
+        return url;
+      };
+
+      // Mapear imágenes dinámicas de tu JSON
+      let uiImages: string[] = [];
+      if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+        if (typeof data.images[0] === 'object') {
+          const sortedImgs = [...data.images].sort((a: any, b: any) => (a.displayOrder || 999) - (b.displayOrder || 999));
+          uiImages = sortedImgs.map((img: any) => {
+            if (img && typeof img === 'object' && img.imageUrl) {
+              return formatImageUrl(img.imageUrl);
+            } else if (typeof img === 'string') {
+              return formatImageUrl(img);
+            }
+            return '/assets/img/house-placeholder.jpg';
+          });
+        } else {
+          uiImages = data.images.map((img: string) => formatImageUrl(img));
+        }
+      } else if (data.imageUrl || data.image) {
+        uiImages = [formatImageUrl(data.imageUrl || data.image)];
+      } else {
+        uiImages = ['/assets/img/house-placeholder.jpg'];
+      }
+
+      // Mapear ubicación
+      let locationStr = 'Ubicación';
+      if (data.address) {
+        if (typeof data.address === 'object') {
+          const parts = [];
+          if (data.address.street) {
+            let streetName = data.address.street;
+            if (data.address.number) {
+              streetName += ` ${data.address.number}`;
+            }
+            parts.push(streetName);
+          }
+          if (data.address.city) parts.push(data.address.city);
+          if (data.address.province) parts.push(data.address.province);
+          if (parts.length > 0) {
+            locationStr = parts.join(', ');
+          }
+        } else if (typeof data.address === 'string') {
+          locationStr = data.address;
+        }
+      } else if (data.location) {
+        locationStr = data.location;
+      }
+
+      // Mapear los extras/características del array exacto de tu JSON
+      const uiFeatures: string[] = [];
+      if (data.extras && Array.isArray(data.extras)) {
+        data.extras.forEach((ext: any) => {
+          if (ext && ext.name) {
+            const capitalized = ext.name.charAt(0).toUpperCase() + ext.name.slice(1);
+            uiFeatures.push(capitalized);
+          } else if (typeof ext === 'string') {
+            uiFeatures.push(ext);
+          }
+        });
+      }
+      if (Array.isArray(data.features)) {
+        data.features.forEach((f: any) => {
+          if (typeof f === 'string') {
+            uiFeatures.push(f);
+          } else if (f && f.name) {
+            uiFeatures.push(f.name);
+          }
+        });
+      }
+      if (uiFeatures.length === 0) {
+        uiFeatures.push('Calefacción', 'Suelo Radiante', 'Aire Concondicionado');
+      }
+
+      // Mapear datos del usuario/agente
+      let agentName = 'Elena Rodríguez';
+      if (typeof data.user === 'string' && data.user) {
+        agentName = data.user;
+      } else if (data.user && typeof data.user === 'object') {
+        agentName = data.user.name || (data.user.firstName ? `${data.user.firstName} ${data.user.lastName || ''}`.trim() : '') || agentName;
+      } else if (data.agent) {
+        agentName = data.agent.name || agentName;
+      }
+
+      this.property = {
+        id: Number(data.id),
+        title: data.title || 'Propiedad sin título',
+        price: Number(data.price) || 0,
+        location: locationStr,
+        description: data.description || data.descripcion || 'No hay descripción disponible para esta propiedad.',
+        images: uiImages,
+        beds: data.residence?.bedrooms || data.beds || data.habitaciones || 0,
+        baths: data.residence?.bathrooms || data.baths || data.banos || 0,
+        sqft: data.surface || data.sqft || data.metros || 0,
+        features: uiFeatures,
+        type: (data.type || data.residence?.type || data.tipoVivienda || 'VIVIENDA').toUpperCase(),
+        status: (data.transaction || data.operacion || data.status || 'EN VENTA').toUpperCase() === 'ALQUILER' ? 'ALQUILER' : 'EN VENTA',
+        agent: {
+          name: agentName,
+          phone: '+34 600 000 000',
+          email: 'info@homely.com',
+          image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1376&auto=format&fit=crop'
+        }
+      };
+    } catch (err) {
+      console.error('Homely Detail Page - Error mapeando datos del objeto de búsqueda:', err);
+      this.loadFallbackMock(Number(data?.id || 0));
+    }
+  }
+
+  private loadFallbackMock(id: number): void {
     this.property = {
-      id: Number(id),
+      id: id,
       title: 'Villa Esmeralda - Lujo y Diseño Moderno',
       price: 1450000,
       location: 'Urbanización La Finca, Pozuelo de Alarcón, Madrid',
@@ -228,3 +416,4 @@ export class PropertyDetailsComponent implements OnInit {
     };
   }
 }
+
