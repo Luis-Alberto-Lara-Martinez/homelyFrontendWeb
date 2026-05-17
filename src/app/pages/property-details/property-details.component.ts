@@ -35,7 +35,7 @@ interface Property {
         <nav class="flex text-sm font-medium text-gray-500">
           <a routerLink="/" class="hover:text-brand-blue transition-colors">Inicio</a>
           <span class="mx-2">/</span>
-          <a routerLink="/comprar-alquilar" class="hover:text-brand-blue transition-colors">Propiedades</a>
+          <a [routerLink]="propertiesLink" queryParamsHandling="preserve" class="hover:text-brand-blue transition-colors">Propiedades</a>
           <span class="mx-2">/</span>
           <span class="text-brand-dark">{{ property?.title }}</span>
         </nav>
@@ -190,6 +190,7 @@ interface Property {
 })
 export class PropertyDetailsComponent implements OnInit {
   property: Property | null = null;
+  propertiesLink: string = '/comprar-alquilar';
 
   constructor(
     private route: ActivatedRoute,
@@ -197,6 +198,17 @@ export class PropertyDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // Escuchar parámetros de búsqueda para actualizar dinámicamente el enlace del Breadcrumb
+    this.route.queryParams.subscribe(params => {
+      const lat = params['lat'];
+      const lng = params['lng'];
+      if (lat && lng) {
+        this.propertiesLink = '/resultados-busqueda';
+      } else {
+        this.propertiesLink = '/comprar-alquilar';
+      }
+    });
+
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
