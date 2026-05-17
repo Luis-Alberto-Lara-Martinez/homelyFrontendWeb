@@ -14,12 +14,34 @@
   <!-- Filter Bar (Solo se muestra cuando ya ha cargado) -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12" *ngIf="!isLoading && allProperties.length > 0">
     
-    <!-- Title / Label for the bar -->
-    <div class="flex items-center gap-3 mb-5 ml-2 animate-in fade-in slide-in-from-left-4 duration-700">
-      <div class="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center text-white shadow-md shadow-brand-blue/20">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+    <!-- Title and Sort Dropdown aligned on the same row -->
+    <div class="flex items-center justify-between mb-5 ml-2 animate-in fade-in slide-in-from-left-4 duration-700">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center text-white shadow-md shadow-brand-blue/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+        </div>
+        <h3 class="text-xl font-extrabold text-brand-dark tracking-tight font-sans">Filtros Avanzados</h3>
       </div>
-      <h3 class="text-xl font-extrabold text-brand-dark tracking-tight font-sans">Filtros Avanzados</h3>
+
+      <!-- Custom Dropdown with Gradient style aligned on the right -->
+      <div class="relative">
+        <button type="button" (click)="toggleDropdown('sort', $event)" 
+          class="bg-gradient-brand text-white font-bold rounded-2xl px-6 py-3 shadow-md shadow-brand-blue/20 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3 cursor-pointer text-sm">
+          <span>Ordenar por: {{ getDisplayValue('sort') }}</span>
+          <svg class="w-4 h-4 text-white flex-shrink-0 transition-transform duration-200" [class.rotate-180]="activeDropdown === 'sort'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        
+        <!-- Dropdown Menu -->
+        <div *ngIf="activeDropdown === 'sort'" 
+          class="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl shadow-brand-dark/10 border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+          <button *ngFor="let opt of sortOptions" (click)="selectOption('sort', opt.value, $event)"
+            class="w-full text-left px-5 py-3 hover:bg-brand-blue/5 text-sm font-semibold transition-colors flex items-center justify-between text-gray-700"
+            [class.text-brand-blue]="filterSort === opt.value" [class.bg-brand-blue/5]="filterSort === opt.value">
+            {{ opt.label }}
+            <svg *ngIf="filterSort === opt.value" class="w-4 h-4 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Main Container styled in alignment with the Homely Design System -->
@@ -133,38 +155,7 @@
   <!-- Content State -->
   <div *ngIf="!isLoading" class="animate-in fade-in duration-500">
     
-    <!-- Info & Sort Sub-bar -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" *ngIf="allProperties.length > 0">
-      <!-- Results counter -->
-      <div>
-        <p class="text-gray-500 font-medium font-sans">
-          Se han encontrado <span class="text-brand-dark font-extrabold text-lg">{{ propertiesList.length }}</span> viviendas
-        </p>
-      </div>
 
-      <!-- Custom Dropdown with Gradient style matching user's reference -->
-      <div class="relative self-start sm:self-auto">
-        <div class="flex items-center gap-3">
-          <span class="text-xs font-bold text-gray-400 uppercase tracking-wider hidden sm:inline">Ordenar por:</span>
-          <button type="button" (click)="toggleDropdown('sort', $event)" 
-            class="bg-gradient-brand text-white font-bold rounded-2xl px-6 py-3.5 shadow-md shadow-brand-blue/20 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3 cursor-pointer">
-            <span>{{ getDisplayValue('sort') }}</span>
-            <svg class="w-4 h-4 text-white flex-shrink-0 transition-transform duration-200" [class.rotate-180]="activeDropdown === 'sort'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-          </button>
-        </div>
-        
-        <!-- Dropdown Menu -->
-        <div *ngIf="activeDropdown === 'sort'" 
-          class="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl shadow-brand-dark/10 border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
-          <button *ngFor="let opt of sortOptions" (click)="selectOption('sort', opt.value, $event)"
-            class="w-full text-left px-5 py-3 hover:bg-brand-blue/5 text-sm font-semibold transition-colors flex items-center justify-between text-gray-700"
-            [class.text-brand-blue]="filterSort === opt.value" [class.bg-brand-blue/5]="filterSort === opt.value">
-            {{ opt.label }}
-            <svg *ngIf="filterSort === opt.value" class="w-4 h-4 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-          </button>
-        </div>
-      </div>
-    </div>
 
     <app-featured-properties [properties]="propertiesList"></app-featured-properties>
   </div>
