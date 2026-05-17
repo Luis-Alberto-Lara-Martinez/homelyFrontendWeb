@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, HostListener, ElementRef } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -11,7 +11,6 @@ declare let L: any;
   templateUrl: './hero.component.html'
 })
 export class HeroComponent {
-  maxPrice: number = 500000;
   location: string = '';
   showMapModal: boolean = false;
   private map: any;
@@ -22,55 +21,7 @@ export class HeroComponent {
   tempLocationData: any = null;
   private circle: any;
 
-  get formattedMaxPrice(): string {
-    if (!this.maxPrice && this.maxPrice !== 0) return '';
-    return new Intl.NumberFormat('en-US').format(this.maxPrice);
-  }
-
-  set formattedMaxPrice(value: string) {
-    const cleanValue = value.replace(/\D/g, '');
-    this.maxPrice = cleanValue ? parseInt(cleanValue, 10) : 0;
-  }
-
-  // Custom Dropdowns
-  propertyTypeOpen = false;
-  operationOpen = false;
-  
-  propertyTypes = ['Cualquier tipo', 'Casa o Chalet', 'Apartamento', 'Villa de Lujo', 'Estudio'];
-  selectedPropertyType = 'Cualquier tipo';
-
-  operations = ['Comprar', 'Alquilar'];
-  selectedOperation = 'Comprar';
-
-  constructor(private cdr: ChangeDetectorRef, private el: ElementRef) {}
-
-  @HostListener('document:click', ['$event'])
-  onClick(event: MouseEvent) {
-    if (!this.el.nativeElement.contains(event.target)) {
-      this.propertyTypeOpen = false;
-      this.operationOpen = false;
-    }
-  }
-
-  togglePropertyType() {
-    this.propertyTypeOpen = !this.propertyTypeOpen;
-    this.operationOpen = false;
-  }
-
-  toggleOperation() {
-    this.operationOpen = !this.operationOpen;
-    this.propertyTypeOpen = false;
-  }
-
-  selectPropertyType(type: string) {
-    this.selectedPropertyType = type;
-    this.propertyTypeOpen = false;
-  }
-
-  selectOperation(op: string) {
-    this.selectedOperation = op;
-    this.operationOpen = false;
-  }
+  constructor(private cdr: ChangeDetectorRef) {}
 
   openMapModal() {
     this.showMapModal = true;
