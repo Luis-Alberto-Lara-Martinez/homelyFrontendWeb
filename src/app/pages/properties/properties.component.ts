@@ -25,6 +25,7 @@ export class PropertiesComponent implements OnInit {
   filterMinPrice: number | null = null;
   filterMaxPrice: number | null = null;
   filterBeds: string = '';
+  filterSort: string = '';
 
   // Estado para Dropdowns personalizados
   activeDropdown: string | null = null;
@@ -50,6 +51,13 @@ export class PropertiesComponent implements OnInit {
     { label: '2 Habitaciones', value: '2' },
     { label: '3 Habitaciones', value: '3' },
     { label: '4+ Habitaciones', value: '4' }
+  ];
+
+  sortOptions = [
+    { label: 'Destacados', value: '' },
+    { label: 'Precio: menor a mayor', value: 'price_asc' },
+    { label: 'Precio: mayor a menor', value: 'price_desc' },
+    { label: 'Habitaciones: más a menos', value: 'beds_desc' }
   ];
 
   constructor(
@@ -82,6 +90,8 @@ export class PropertiesComponent implements OnInit {
       this.filterType = value;
     } else if (filterName === 'beds') {
       this.filterBeds = value;
+    } else if (filterName === 'sort') {
+      this.filterSort = value;
     }
     this.activeDropdown = null;
     this.applyFilters();
@@ -94,6 +104,8 @@ export class PropertiesComponent implements OnInit {
       return this.typeOptions.find(o => o.value === this.filterType)?.label || 'Todos los tipos';
     } else if (filterName === 'beds') {
       return this.bedsOptions.find(o => o.value === this.filterBeds)?.label || 'Cualquiera';
+    } else if (filterName === 'sort') {
+      return this.sortOptions.find(o => o.value === this.filterSort)?.label || 'Destacados';
     }
     return '';
   }
@@ -141,7 +153,7 @@ export class PropertiesComponent implements OnInit {
   }
 
   applyFilters() {
-    this.propertiesList = this.allProperties.filter((prop: any) => {
+    let filtered = this.allProperties.filter((prop: any) => {
       // 1. Filtrar por Operación (Venta / Alquiler)
       if (this.filterTransaction) {
         const propTrans = (prop.transaction || prop.operacion || prop.status || '').toLowerCase();
@@ -181,6 +193,24 @@ export class PropertiesComponent implements OnInit {
 
       return true;
     });
+
+    // 5. Aplicar ordenación
+    if (this.filterSort) {
+      filtered.sort((a: any, b: any) => {
+        if (this.filterSort === 'price_asc') {
+          return (Number(a.price) || 0) - (Number(b.price) || 0);
+        } else if (this.filterSort === 'price_desc') {
+          return (Number(b.price) || 0) - (Number(a.price) || 0);
+        } else if (this.filterSort === 'beds_desc') {
+          const bedsA = Number(a.residence?.bedrooms || a.beds || a.habitaciones) || 0;
+          const bedsB = Number(b.residence?.bedrooms || b.beds || b.habitaciones) || 0;
+          return bedsB - bedsA;
+        }
+        return 0;
+      });
+    }
+
+    this.propertiesList = filtered;
     this.cdr.detectChanges();
   }
 
@@ -190,6 +220,7 @@ export class PropertiesComponent implements OnInit {
     this.filterMinPrice = null;
     this.filterMaxPrice = null;
     this.filterBeds = '';
+    this.filterSort = '';
     this.applyFilters();
   }
 }
