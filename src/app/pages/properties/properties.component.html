@@ -5,12 +5,24 @@
         <h1 class="text-3xl font-extrabold text-brand-dark font-sans">Catálogo de Propiedades</h1>
         <p class="text-gray-500 mt-2">Explora todas nuestras propiedades disponibles para venta y alquiler.</p>
       </div>
-      <div class="text-sm font-bold text-brand-blue bg-brand-blue/10 px-4 py-2 rounded-xl">
+      <div class="text-sm font-bold text-brand-blue bg-brand-blue/10 px-4 py-2 rounded-xl" *ngIf="!isLoading">
         {{ propertiesList.length }} Propiedades
       </div>
     </div>
   </div>
 
-  <app-featured-properties [properties]="propertiesList"></app-featured-properties>
+  <!-- Loading State with Premium Glow -->
+  <div *ngIf="isLoading" class="flex justify-center items-center py-28 animate-in fade-in duration-300">
+    <div class="relative flex items-center justify-center">
+      <!-- Outer glowing circle -->
+      <div class="absolute inset-0 bg-brand-blue/20 rounded-full blur-xl scale-150 animate-pulse"></div>
+      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-brand-blue shadow-xl"></div>
+    </div>
+  </div>
+
+  <!-- Content State -->
+  <div *ngIf="!isLoading" class="animate-in fade-in duration-500">
+    <app-featured-properties [properties]="propertiesList"></app-featured-properties>
+  </div>
   <app-cta-banner></app-cta-banner>
 </div>

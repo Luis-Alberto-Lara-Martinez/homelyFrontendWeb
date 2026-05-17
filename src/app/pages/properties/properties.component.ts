@@ -15,6 +15,7 @@ export class PropertiesComponent implements OnInit {
   propertiesList: any[] = [];
   isSearchFiltered: boolean = false;
   searchRadiusKm: number = 2;
+  isLoading: boolean = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -38,6 +39,9 @@ export class PropertiesComponent implements OnInit {
   }
 
   loadAllProperties() {
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
     // Consultamos la base de datos con las coordenadas de Madrid y un radio masivo de 5000 Km
     // para recuperar todas las propiedades de España usando la misma función de radio.
     this.propertiesService.getPropertiesWithinRadius(40.416775, -3.703790, 5000).subscribe({
@@ -53,10 +57,13 @@ export class PropertiesComponent implements OnInit {
           list = data.content;
         }
         this.propertiesList = list;
+        this.isLoading = false;
         this.cdr.detectChanges(); // Forzar actualización de pantalla
       },
       error: (err: any) => {
         console.error('Error loading all properties:', err);
+        this.propertiesList = []; // Si hay error, vaciamos para mostrar el cartel de "no se encuentran viviendas"
+        this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
