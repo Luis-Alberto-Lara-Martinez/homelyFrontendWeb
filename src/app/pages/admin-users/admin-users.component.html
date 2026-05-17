@@ -69,10 +69,24 @@
 
               <!-- Rol -->
               <td class="px-6 py-6">
-                <select *ngIf="editingUserId === user.id" [(ngModel)]="editData.roleId"
-                  class="bg-white border border-gray-200 rounded-xl px-2.5 py-1.5 text-xs font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-blue/30 outline-none">
-                  <option *ngFor="let role of roles" [value]="role.id">{{role.name}}</option>
-                </select>
+                <div *ngIf="editingUserId === user.id" class="relative inline-block w-28">
+                  <button type="button" (click)="toggleDropdown('role', $event)" 
+                    class="w-full bg-white border border-gray-200 hover:border-gray-300 text-brand-dark font-bold text-xs rounded-xl px-3 py-2 pr-8 shadow-sm flex items-center justify-between transition-all focus:outline-none focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue cursor-pointer">
+                    <span class="truncate">{{ getSelectedRoleName() }}</span>
+                    <svg class="w-4 h-4 text-brand-blue flex-shrink-0 transition-transform duration-200" [class.rotate-180]="activeDropdown === 'role'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                  </button>
+                  
+                  <!-- Dropdown List -->
+                  <div *ngIf="activeDropdown === 'role'" 
+                    class="absolute top-full left-0 mt-1.5 w-full bg-white rounded-xl shadow-xl shadow-brand-dark/10 border border-gray-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+                    <button type="button" *ngFor="let role of roles" (click)="selectRole(role.id, $event)"
+                      class="w-full text-left px-3.5 py-2 hover:bg-brand-blue/5 text-[11px] font-bold transition-colors flex items-center justify-between"
+                      [class.text-brand-blue]="editData.roleId === role.id" [class.bg-brand-blue/5]="editData.roleId === role.id">
+                      {{ role.name }}
+                      <svg *ngIf="editData.roleId === role.id" class="w-3.5 h-3.5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    </button>
+                  </div>
+                </div>
                 <span *ngIf="editingUserId !== user.id"
                   [class]="user.role.toLowerCase() === 'admin' ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/20' : 'bg-gray-100 text-gray-500 border-gray-200'"
                   class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border">
@@ -82,10 +96,24 @@
 
               <!-- Estado -->
               <td class="px-6 py-6">
-                <select *ngIf="editingUserId === user.id" [(ngModel)]="editData.statusId"
-                  class="bg-white border border-gray-200 rounded-xl px-2.5 py-1.5 text-xs font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-blue/30 outline-none">
-                  <option *ngFor="let stat of statuses" [value]="stat.id">{{stat.name}}</option>
-                </select>
+                <div *ngIf="editingUserId === user.id" class="relative inline-block w-28">
+                  <button type="button" (click)="toggleDropdown('status', $event)" 
+                    class="w-full bg-white border border-gray-200 hover:border-gray-300 text-brand-dark font-bold text-xs rounded-xl px-3 py-2 pr-8 shadow-sm flex items-center justify-between transition-all focus:outline-none focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue cursor-pointer">
+                    <span class="truncate">{{ getSelectedStatusName() }}</span>
+                    <svg class="w-4 h-4 text-brand-blue flex-shrink-0 transition-transform duration-200" [class.rotate-180]="activeDropdown === 'status'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                  </button>
+                  
+                  <!-- Dropdown List -->
+                  <div *ngIf="activeDropdown === 'status'" 
+                    class="absolute top-full left-0 mt-1.5 w-full bg-white rounded-xl shadow-xl shadow-brand-dark/10 border border-gray-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+                    <button type="button" *ngFor="let stat of statuses" (click)="selectStatus(stat.id, $event)"
+                      class="w-full text-left px-3.5 py-2 hover:bg-brand-blue/5 text-[11px] font-bold transition-colors flex items-center justify-between"
+                      [class.text-brand-blue]="editData.statusId === stat.id" [class.bg-brand-blue/5]="editData.statusId === stat.id">
+                      {{ stat.name }}
+                      <svg *ngIf="editData.statusId === stat.id" class="w-3.5 h-3.5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    </button>
+                  </div>
+                </div>
                 <div *ngIf="editingUserId !== user.id" class="flex items-center gap-2">
                   <span [class]="user.status === 'activo' ? 'bg-green-500' : 'bg-gray-300'"
                     class="w-2 h-2 rounded-full"></span>

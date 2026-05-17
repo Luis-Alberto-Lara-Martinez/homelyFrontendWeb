@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Users } from '../../services/users/users';
@@ -23,6 +23,7 @@ export class AdminUsersComponent implements OnInit {
   // Edición
   editingUserId: number | null = null;
   editData: { roleId?: number, statusId?: number } = {};
+  activeDropdown: 'role' | 'status' | null = null;
 
   // Modal de Creación
   showCreateModal: boolean = false;
@@ -194,13 +195,51 @@ export class AdminUsersComponent implements OnInit {
       roleId: userRole ? userRole.id : undefined,
       statusId: userStatus ? userStatus.id : undefined
     };
+    this.activeDropdown = null;
     this.cdr.detectChanges();
   }
 
   cancelEdit() {
     this.editingUserId = null;
     this.editData = {};
+    this.activeDropdown = null;
     this.cdr.detectChanges();
+  }
+
+  @HostListener('document:click')
+  closeDropdowns() {
+    this.activeDropdown = null;
+  }
+
+  toggleDropdown(type: 'role' | 'status', event: Event) {
+    event.stopPropagation();
+    if (this.activeDropdown === type) {
+      this.activeDropdown = null;
+    } else {
+      this.activeDropdown = type;
+    }
+  }
+
+  selectRole(roleId: number, event: Event) {
+    event.stopPropagation();
+    this.editData.roleId = roleId;
+    this.activeDropdown = null;
+  }
+
+  selectStatus(statusId: number, event: Event) {
+    event.stopPropagation();
+    this.editData.statusId = statusId;
+    this.activeDropdown = null;
+  }
+
+  getSelectedRoleName(): string {
+    const role = this.roles.find(r => r.id === this.editData.roleId);
+    return role ? role.name : 'Seleccionar Rol';
+  }
+
+  getSelectedStatusName(): string {
+    const stat = this.statuses.find(s => s.id === this.editData.statusId);
+    return stat ? stat.name : 'Seleccionar Estado';
   }
 
   saveEdit(user: any) {
