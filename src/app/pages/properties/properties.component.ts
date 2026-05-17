@@ -133,6 +133,15 @@ export class PropertiesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.filterTransaction = params['transaction'] || '';
+      this.filterType = params['type'] || '';
+      
+      if (this.allProperties.length > 0) {
+        this.applyFilters();
+      }
+    });
+
     this.loadAllProperties();
     
     setTimeout(() => {
