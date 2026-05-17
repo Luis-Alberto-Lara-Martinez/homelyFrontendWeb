@@ -32,6 +32,14 @@ export class PropertiesComponent implements OnInit {
         this.isSearchFiltered = true;
         this.searchRadiusKm = Number(rad) || 2;
         this.loadPropertiesWithinRadius(Number(lat), Number(lng), this.searchRadiusKm);
+
+        // Desplazarse suavemente y de forma directa a los resultados
+        setTimeout(() => {
+          const element = document.getElementById('propiedades');
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 300);
       } else {
         this.isSearchFiltered = false;
         this.loadAllProperties();

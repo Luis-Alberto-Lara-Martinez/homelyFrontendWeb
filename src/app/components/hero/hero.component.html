@@ -37,7 +37,7 @@
           <label
             class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 group-focus-within:text-brand-blue transition-colors">Ubicación</label>
           <div class="relative w-full">
-            <input type="text" placeholder="Ciudad, barrio o zona..." [(ngModel)]="location"
+            <input type="text" placeholder="Ciudad, barrio o zona..." [(ngModel)]="location" (keyup.enter)="onSearchProperties()"
               class="w-full bg-gray-50 rounded-xl pl-4 pr-12 py-3.5 text-gray-800 font-medium outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue/30 transition-all">
             <button (click)="openMapModal()"
               class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-blue p-2 rounded-lg hover:bg-brand-blue/10 transition-colors"

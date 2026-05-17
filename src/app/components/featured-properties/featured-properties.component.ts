@@ -11,42 +11,6 @@ import { RouterModule } from '@angular/router';
 export class FeaturedPropertiesComponent {
   private _properties: any[] = [];
 
-  defaultProperties: any[] = [
-    {
-      id: 1,
-      title: 'Villa Moderna con Piscina',
-      imageUrl: '/assets/img/house-1.jpg',
-      status: 'En Venta',
-      price: 1250000,
-      location: 'Majadahonda, Madrid',
-      beds: 4,
-      baths: 3,
-      sqft: 240
-    },
-    {
-      id: 2,
-      title: 'Ático con Vistas al Mar',
-      imageUrl: '/assets/img/house-2.jpg',
-      status: 'Alquiler',
-      price: 2100,
-      location: 'Diagonal Mar, Barcelona',
-      beds: 2,
-      baths: 2,
-      sqft: 110
-    },
-    {
-      id: 3,
-      title: 'Chalet Adosado de Diseño',
-      imageUrl: '/assets/img/house-3.jpg',
-      status: 'En Venta',
-      price: 450000,
-      location: 'Rocafort, Valencia',
-      beds: 3,
-      baths: 2,
-      sqft: 180
-    }
-  ];
-
   formatImageUrl(url: string): string {
     if (!url) return url;
     const targetBase = 'https://res.cloudinary.com/homely-cloudinary/image/upload/';
@@ -89,10 +53,7 @@ export class FeaturedPropertiesComponent {
         };
       });
     } else {
-      this._properties = this.defaultProperties.map(prop => ({
-        ...prop,
-        mainImageUrl: prop.imageUrl
-      }));
+      this._properties = [];
     }
   }
 

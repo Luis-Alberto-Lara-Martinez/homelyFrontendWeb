@@ -1,20 +1,19 @@
 <section id="propiedades" class="py-24 bg-gray-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
-      <div>
-        <h2 class="text-3xl lg:text-4xl font-bold text-brand-dark mb-4">Propiedades Destacadas</h2>
-        <p class="text-gray-600 text-lg">Nuestra selección curada de propiedades prémium listas para entrar a vivir.</p>
-      </div>
-      <a href="#"
-        class="hidden sm:inline-flex items-center text-brand-blue font-semibold hover:text-brand-purple transition-all hover:translate-x-1">
-        Explorar todo el catálogo
-        <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+
+
+    <!-- Estado Vacío si no hay propiedades -->
+    <div *ngIf="properties.length === 0" class="py-16 text-center animate-in fade-in zoom-in-95 duration-500">
+      <div class="w-24 h-24 bg-brand-blue/5 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-blue/60 shadow-inner">
+        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
         </svg>
-      </a>
+      </div>
+      <h3 class="text-2xl font-black text-brand-dark mb-2 font-sans">No se han encontrado propiedades</h3>
+      <p class="text-gray-500 max-w-sm mx-auto font-medium">No hay ninguna propiedad disponible en esta zona y radio seleccionados. Prueba a ampliar el radio de búsqueda.</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" *ngIf="properties.length > 0">
 
       <!-- Tarjeta de propiedad dinámica -->
       <article *ngFor="let prop of properties" [routerLink]="['/propiedad', prop.id]"
@@ -75,7 +74,7 @@
 
     </div>
 
-    <div class="mt-14 text-center sm:hidden">
+    <div class="mt-14 text-center sm:hidden" *ngIf="properties.length > 0">
       <button
         class="w-full bg-white border-2 border-brand-blue text-brand-blue px-6 py-3.5 rounded-xl font-bold hover:bg-brand-blue hover:text-white transition-colors active:scale-95 shadow-sm">
         Ver todas las propiedades
