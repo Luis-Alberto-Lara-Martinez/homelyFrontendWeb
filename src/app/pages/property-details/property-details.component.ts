@@ -50,7 +50,7 @@ interface Property {
             <!-- Galería de Imágenes Principal -->
             <div class="relative rounded-3xl overflow-hidden shadow-2xl group select-none">
               <!-- Main Image -->
-              <img [src]="property?.images?.[activeImageIndex]" (click)="openLightbox()" class="w-full h-[500px] object-cover transition-all duration-500 ease-in-out transform group-hover:scale-102 cursor-zoom-in" title="Ver imagen completa">
+              <img [src]="property?.images?.[activeImageIndex]" (click)="openLightbox()" class="w-full h-[500px] object-cover transition-all duration-300 ease-in-out transform group-hover:scale-102 cursor-zoom-in" [class.opacity-40]="isAnimating" [class.scale-98]="isAnimating" title="Ver imagen completa">
               
               <!-- Badges -->
               <div class="absolute top-6 left-6 flex gap-2 z-10">
@@ -228,7 +228,7 @@ interface Property {
         <div class="relative max-w-5xl max-h-[80vh] w-full px-4 flex items-center justify-center" (click)="$event.stopPropagation()">
           
           <!-- Large Image inside Modal -->
-          <img [src]="property?.images?.[activeImageIndex]" class="max-w-full max-h-[80vh] rounded-3xl shadow-2xl border border-white/10 object-contain cursor-default select-all animate-in zoom-in-95 duration-300">
+          <img [src]="property?.images?.[activeImageIndex]" class="max-w-full max-h-[80vh] rounded-3xl shadow-2xl border border-white/10 object-contain cursor-default select-all animate-img-zoom transition-all duration-300 ease-in-out transform" [class.opacity-40]="isAnimating" [class.scale-95]="isAnimating">
 
           <!-- Navigation inside Lightbox -->
           <ng-container *ngIf="(property?.images?.length || 0) > 1">
@@ -256,6 +256,20 @@ interface Property {
     .bg-gradient-brand {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     }
+    @keyframes modalFadeIn {
+      from { opacity: 0; backdrop-filter: blur(0px); }
+      to { opacity: 1; backdrop-filter: blur(24px); }
+    }
+    @keyframes imageZoomIn {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .animate-modal-fade {
+      animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .animate-img-zoom {
+      animation: imageZoomIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
   `]
 })
 export class PropertyDetailsComponent implements OnInit {
@@ -263,6 +277,7 @@ export class PropertyDetailsComponent implements OnInit {
   propertiesLink: string = '/propiedades';
   activeImageIndex: number = 0;
   isLightboxOpen: boolean = false;
+  isAnimating: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -292,11 +307,19 @@ export class PropertyDetailsComponent implements OnInit {
     }
   }
 
+  animateImageChange() {
+    this.isAnimating = true;
+    setTimeout(() => {
+      this.isAnimating = false;
+    }, 150);
+  }
+
   prevImage(event: Event) {
     event.stopPropagation();
     if (this.property && this.property.images) {
       const len = this.property.images.length;
       this.activeImageIndex = (this.activeImageIndex - 1 + len) % len;
+      this.animateImageChange();
     }
   }
 
@@ -305,12 +328,16 @@ export class PropertyDetailsComponent implements OnInit {
     if (this.property && this.property.images) {
       const len = this.property.images.length;
       this.activeImageIndex = (this.activeImageIndex + 1) % len;
+      this.animateImageChange();
     }
   }
 
   selectImage(index: number, event: Event) {
     event.stopPropagation();
-    this.activeImageIndex = index;
+    if (this.activeImageIndex !== index) {
+      this.activeImageIndex = index;
+      this.animateImageChange();
+    }
   }
 
   ngOnInit(): void {
