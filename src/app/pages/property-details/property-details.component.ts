@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Properties } from '../../services/properties/properties';
@@ -50,7 +50,7 @@ interface Property {
             <!-- Galería de Imágenes Principal -->
             <div class="relative rounded-3xl overflow-hidden shadow-2xl group select-none">
               <!-- Main Image -->
-              <img [src]="property?.images?.[activeImageIndex]" class="w-full h-[500px] object-cover transition-all duration-500 ease-in-out transform group-hover:scale-102">
+              <img [src]="property?.images?.[activeImageIndex]" (click)="openLightbox()" class="w-full h-[500px] object-cover transition-all duration-500 ease-in-out transform group-hover:scale-102 cursor-zoom-in" title="Ver imagen completa">
               
               <!-- Badges -->
               <div class="absolute top-6 left-6 flex gap-2 z-10">
@@ -215,6 +215,41 @@ interface Property {
 
         </div>
       </div>
+
+      <!-- Lightbox Modal Fullscreen -->
+      <div *ngIf="isLightboxOpen" (click)="closeLightbox()" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xl flex flex-col items-center justify-center select-none cursor-zoom-out animate-in fade-in duration-300">
+        <!-- Close Button (Glassmorphic capsule) -->
+        <button (click)="closeLightbox()" class="absolute top-6 right-6 px-5 py-2.5 bg-black/40 hover:bg-black/60 text-white/95 rounded-full flex items-center gap-2 border border-white/10 transition-all hover:scale-105 active:scale-95 duration-200 cursor-pointer focus:outline-none backdrop-blur-md text-sm font-bold shadow-lg">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+          Cerrar
+        </button>
+
+        <!-- Main Image Container -->
+        <div class="relative max-w-5xl max-h-[80vh] w-full px-4 flex items-center justify-center" (click)="$event.stopPropagation()">
+          
+          <!-- Large Image inside Modal -->
+          <img [src]="property?.images?.[activeImageIndex]" class="max-w-full max-h-[80vh] rounded-3xl shadow-2xl border border-white/10 object-contain cursor-default select-all animate-in zoom-in-95 duration-300">
+
+          <!-- Navigation inside Lightbox -->
+          <ng-container *ngIf="(property?.images?.length || 0) > 1">
+            <!-- Left Arrow inside Lightbox -->
+            <button (click)="prevImage($event)" class="absolute left-8 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110 active:scale-95 duration-200 cursor-pointer focus:outline-none backdrop-blur-md border border-white/10">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            
+            <!-- Right Arrow inside Lightbox -->
+            <button (click)="nextImage($event)" class="absolute right-8 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110 active:scale-95 duration-200 cursor-pointer focus:outline-none backdrop-blur-md border border-white/10">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </ng-container>
+        </div>
+
+        <!-- Lightbox Counter / Details -->
+        <div class="mt-6 text-center bg-black/30 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/5 text-white/95 shadow-xl" (click)="$event.stopPropagation()">
+          <h4 class="font-bold text-lg tracking-tight">{{ property?.title }}</h4>
+          <p class="text-white/60 text-xs font-semibold mt-1 uppercase tracking-widest">Imagen {{ activeImageIndex + 1 }} de {{ property?.images?.length }}</p>
+        </div>
+      </div>
     </div>
   `,
   styles: [`
@@ -227,11 +262,35 @@ export class PropertyDetailsComponent implements OnInit {
   property: Property | null = null;
   propertiesLink: string = '/propiedades';
   activeImageIndex: number = 0;
+  isLightboxOpen: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private propertiesService: Properties
   ) { }
+
+  openLightbox() {
+    this.isLightboxOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeLightbox() {
+    this.isLightboxOpen = false;
+    document.body.style.overflow = '';
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (this.isLightboxOpen) {
+      if (event.key === 'Escape') {
+        this.closeLightbox();
+      } else if (event.key === 'ArrowLeft') {
+        this.prevImage(event);
+      } else if (event.key === 'ArrowRight') {
+        this.nextImage(event);
+      }
+    }
+  }
 
   prevImage(event: Event) {
     event.stopPropagation();
