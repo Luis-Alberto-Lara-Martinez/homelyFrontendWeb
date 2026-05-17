@@ -1,21 +1,33 @@
-// properties.service.ts (Ejemplo en Angular)
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class Properties {
-  private baseUrl = 'http://localhost:8080/api/properties'; // Base URL del backend
+  private baseUrl = environment.backendUrl + '/api/properties'; // Base URL del backend
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  // Obtener todas las propiedades (asume GET /api/properties)
+  // Obtener todas las propiedades (asume GET /api/properties/)
   getAllProperties(): Observable<any[]> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any[]>(`${this.baseUrl}`, { headers });
+    return this.http.get<any[]>(`${this.baseUrl}/`, { headers });
+  }
+
+  // Obtener propiedades dentro de un radio (POST /api/property/all)
+  getPropertiesWithinRadius(latitude: number, longitude: number, radiusKm: number): Observable<any[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const body = {
+      latitude: latitude,
+      longitude: longitude,
+      radiusKm: radiusKm
+    };
+    return this.http.post<any[]>(`${environment.backendUrl}/api/property/all`, body, { headers });
   }
 
   // Obtener una propiedad por ID (asume GET /api/properties/{id})

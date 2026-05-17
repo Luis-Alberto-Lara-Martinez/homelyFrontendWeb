@@ -1,6 +1,7 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 declare let L: any;
 
@@ -16,12 +17,37 @@ export class HeroComponent {
   private map: any;
   private marker: any;
 
+  selectedLatitude: number | null = null;
+  selectedLongitude: number | null = null;
+
   distance: number = 2;
   searchQuery: string = '';
   tempLocationData: any = null;
   private circle: any;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private router: Router
+  ) {}
+
+  onSearchProperties() {
+    if (this.location.trim() === '') {
+      this.selectedLatitude = null;
+      this.selectedLongitude = null;
+    }
+
+    if (this.selectedLatitude !== null && this.selectedLongitude !== null) {
+      this.router.navigate(['/comprar-alquilar'], {
+        queryParams: {
+          lat: this.selectedLatitude,
+          lng: this.selectedLongitude,
+          rad: this.distance
+        }
+      });
+    } else {
+      this.router.navigate(['/comprar-alquilar']);
+    }
+  }
 
   openMapModal() {
     this.showMapModal = true;
@@ -63,6 +89,9 @@ export class HeroComponent {
   }
 
   setMarkerAndCircle(lat: number, lng: number) {
+    this.selectedLatitude = lat;
+    this.selectedLongitude = lng;
+
     if (this.marker) {
       this.map.removeLayer(this.marker);
     }
