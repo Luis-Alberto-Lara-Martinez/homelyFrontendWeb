@@ -1,7 +1,10 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Properties } from '../../services/properties/properties';
+
+const GENERIC_AGENT_IMAGE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%232563eb"/><stop offset="100%" stop-color="%231d4ed8"/></linearGradient></defs><rect width="128" height="128" rx="32" fill="url(%23g)"/><path d="M64 28 L32 56 V96 H96 V56 Z" fill="white" opacity="0.15"/><path d="M64 22 L24 54 L32 60 L64 34 L96 60 L104 54 Z" fill="white"/><rect x="52" y="66" width="24" height="30" rx="6" fill="white"/><circle cx="64" cy="46" r="6" fill="white" opacity="0.8"/></svg>';
 
 interface Property {
   id: number;
@@ -27,7 +30,7 @@ interface Property {
 @Component({
   selector: 'app-property-details',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   template: `
     <div class="min-h-screen bg-gray-50 pt-24 pb-12">
       <!-- Breadcrumbs -->
@@ -181,23 +184,63 @@ interface Property {
               </div>
 
               <!-- Formulario de Contacto -->
-              <form class="space-y-4">
+              <form *ngIf="!isSubmitted" #contactFormRef="ngForm" (ngSubmit)="submitContactForm(contactFormRef)" class="space-y-5" novalidate>
                 <div>
                   <label class="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Tu Nombre</label>
-                  <input type="text" placeholder="Ej: Nombre Ejemplo" class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all">
+                  <input type="text" name="name" [(ngModel)]="contactData.name" required #nameInput="ngModel" placeholder="Ej: Nombre Ejemplo" 
+                    [class.border-red-400]="nameInput.invalid && (nameInput.dirty || nameInput.touched || contactFormRef.submitted)"
+                    [class.focus:ring-red-100]="nameInput.invalid && (nameInput.dirty || nameInput.touched || contactFormRef.submitted)"
+                    [class.focus:border-red-400]="nameInput.invalid && (nameInput.dirty || nameInput.touched || contactFormRef.submitted)"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all">
+                  <div *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched || contactFormRef.submitted)" class="text-red-500 text-xs font-bold mt-1.5 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                    El nombre es obligatorio.
+                  </div>
                 </div>
                 <div>
                   <label class="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Tu Email</label>
-                  <input type="email" placeholder="ejemplo@correo.com" class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all">
+                  <input type="email" name="email" [(ngModel)]="contactData.email" required email #emailInput="ngModel" placeholder="ejemplo@correo.com" 
+                    [class.border-red-400]="emailInput.invalid && (emailInput.dirty || emailInput.touched || contactFormRef.submitted)"
+                    [class.focus:ring-red-100]="emailInput.invalid && (emailInput.dirty || emailInput.touched || contactFormRef.submitted)"
+                    [class.focus:border-red-400]="emailInput.invalid && (emailInput.dirty || emailInput.touched || contactFormRef.submitted)"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all">
+                  <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched || contactFormRef.submitted)" class="text-red-500 text-xs font-bold mt-1.5 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                    <span *ngIf="emailInput.errors?.['required']">El correo electrónico es obligatorio.</span>
+                    <span *ngIf="emailInput.errors?.['email']">Introduce un correo electrónico válido.</span>
+                  </div>
                 </div>
                 <div>
                   <label class="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Mensaje</label>
-                  <textarea rows="4" placeholder="Estoy interesado en esta propiedad..." class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all resize-none"></textarea>
+                  <textarea rows="4" name="message" [(ngModel)]="contactData.message" required minlength="10" #messageInput="ngModel" placeholder="Estoy interesado en esta propiedad..." 
+                    [class.border-red-400]="messageInput.invalid && (messageInput.dirty || messageInput.touched || contactFormRef.submitted)"
+                    [class.focus:ring-red-100]="messageInput.invalid && (messageInput.dirty || messageInput.touched || contactFormRef.submitted)"
+                    [class.focus:border-red-400]="messageInput.invalid && (messageInput.dirty || messageInput.touched || contactFormRef.submitted)"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all resize-none"></textarea>
+                  <div *ngIf="messageInput.invalid && (messageInput.dirty || messageInput.touched || contactFormRef.submitted)" class="text-red-500 text-xs font-bold mt-1.5 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                    <span *ngIf="messageInput.errors?.['required']">El mensaje es obligatorio.</span>
+                    <span *ngIf="messageInput.errors?.['minlength']">El mensaje debe tener al menos 10 caracteres.</span>
+                  </div>
                 </div>
-                <button type="submit" class="w-full bg-brand-blue text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-xl shadow-brand-blue/30 hover:bg-brand-dark active:scale-95 transition-all">
+                <button type="submit" class="w-full bg-brand-blue text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-xl shadow-brand-blue/30 hover:bg-brand-dark active:scale-95 transition-all cursor-pointer">
                   Contactar ahora
                 </button>
               </form>
+
+              <!-- Mensaje de Éxito de Contacto -->
+              <div *ngIf="isSubmitted" class="text-center py-8 px-4 animate-in fade-in zoom-in-95 duration-300">
+                <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500 shadow-inner">
+                  <svg class="w-10 h-10 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                </div>
+                <h4 class="font-black text-brand-dark text-2xl mb-3">¡Mensaje Enviado!</h4>
+                <p class="text-gray-500 text-sm leading-relaxed mb-6">
+                  Hemos recibido tu solicitud de contacto para esta propiedad. El agente <strong>{{ property?.agent?.name }}</strong> se pondrá en contacto contigo a la brevedad.
+                </p>
+                <button (click)="resetContactForm()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold uppercase tracking-wider py-3 rounded-xl transition-all active:scale-98 text-xs cursor-pointer">
+                  Enviar otro mensaje
+                </button>
+              </div>
 
               <!-- Botones de Acción Rápida -->
               <div class="grid grid-cols-2 gap-4 mt-6">
@@ -307,6 +350,38 @@ export class PropertyDetailsComponent implements OnInit {
   activeImageIndex: number = 0;
   isLightboxOpen: boolean = false;
   isAnimating: boolean = false;
+
+  // Formulario de contacto
+  contactData = {
+    name: '',
+    email: '',
+    message: ''
+  };
+  isSubmitted: boolean = false;
+
+  submitContactForm(form: NgForm) {
+    if (form.valid) {
+      console.log('Contacto enviado (simulado):', this.contactData);
+      this.isSubmitted = true;
+    } else {
+      // Marcar todos los campos como tocados para mostrar errores
+      Object.keys(form.controls).forEach(key => {
+        form.controls[key].markAsTouched();
+      });
+    }
+  }
+
+  resetContactForm(form?: NgForm) {
+    this.isSubmitted = false;
+    this.contactData = {
+      name: '',
+      email: '',
+      message: ''
+    };
+    if (form) {
+      form.resetForm();
+    }
+  }
 
   // Estados de Zoom y Arrastre (Panning)
   zoomLevel: number = 1;
@@ -455,7 +530,7 @@ export class PropertyDetailsComponent implements OnInit {
         // Este estado contiene el objeto JSON completo de la búsqueda y evita hacer llamadas extra
         const stateData = window.history.state?.property;
         console.log('Homely Detail Page - Received ID:', id, 'State Data:', stateData);
-        
+
         if (stateData && Number(stateData.id) === Number(id)) {
           console.log('Homely Detail Page - Usando datos del estado de navegación (búsqueda anterior)!');
           this.mapPropertyData(stateData);
@@ -624,7 +699,7 @@ export class PropertyDetailsComponent implements OnInit {
           name: agentName,
           phone: '+34 600 000 000',
           email: 'info@homely.com',
-          image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1376&auto=format&fit=crop'
+          image: GENERIC_AGENT_IMAGE
         }
       };
       this.activeImageIndex = 0;
@@ -663,7 +738,7 @@ export class PropertyDetailsComponent implements OnInit {
         name: 'Elena Rodríguez',
         phone: '+34 600 000 000',
         email: 'elena@homely.com',
-        image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1376&auto=format&fit=crop'
+        image: GENERIC_AGENT_IMAGE
       }
     };
     this.activeImageIndex = 0;
