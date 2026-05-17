@@ -27,6 +27,17 @@ export class PropertiesComponent implements OnInit {
   filterBeds: string = '';
   filterSort: string = '';
 
+  // Filtros adicionales toggle y parámetros
+  showExtraFilters: boolean = false;
+  filterBaths: string = '';
+  filterMinSize: number | null = null;
+  filterMaxSize: number | null = null;
+  filterHasPool: boolean = false;
+  filterHasGarden: boolean = false;
+  filterHasTerrace: boolean = false;
+  filterHasElevator: boolean = false;
+  filterHasAC: boolean = false;
+
   // Estado para Dropdowns personalizados
   activeDropdown: string | null = null;
 
@@ -51,6 +62,13 @@ export class PropertiesComponent implements OnInit {
     { label: '2 Habitaciones', value: '2' },
     { label: '3 Habitaciones', value: '3' },
     { label: '4+ Habitaciones', value: '4' }
+  ];
+
+  bathsOptions = [
+    { label: 'Cualquiera', value: '' },
+    { label: '1 Baño', value: '1' },
+    { label: '2 Baños', value: '2' },
+    { label: '3+ Baños', value: '3' }
   ];
 
   sortOptions = [
@@ -90,6 +108,8 @@ export class PropertiesComponent implements OnInit {
       this.filterType = value;
     } else if (filterName === 'beds') {
       this.filterBeds = value;
+    } else if (filterName === 'baths') {
+      this.filterBaths = value;
     } else if (filterName === 'sort') {
       this.filterSort = value;
     }
@@ -104,6 +124,8 @@ export class PropertiesComponent implements OnInit {
       return this.typeOptions.find(o => o.value === this.filterType)?.label || 'Todos los tipos';
     } else if (filterName === 'beds') {
       return this.bedsOptions.find(o => o.value === this.filterBeds)?.label || 'Cualquiera';
+    } else if (filterName === 'baths') {
+      return this.bathsOptions.find(o => o.value === this.filterBaths)?.label || 'Cualquiera';
     } else if (filterName === 'sort') {
       return this.sortOptions.find(o => o.value === this.filterSort)?.label || 'Destacados';
     }
@@ -191,6 +213,54 @@ export class PropertiesComponent implements OnInit {
         }
       }
 
+      // 4b. Filtrar por Baños (Filtro Adicional)
+      if (this.filterBaths) {
+        const baths = Number(prop.residence?.bathrooms || prop.baths || prop.banos || prop.residence?.baths) || 0;
+        const requiredBaths = Number(this.filterBaths);
+        if (requiredBaths === 3) {
+          if (baths < 3) return false;
+        } else {
+          if (baths !== requiredBaths) return false;
+        }
+      }
+
+      // 4c. Filtrar por Superficie (Filtro Adicional)
+      const size = Number(prop.residence?.size || prop.size || prop.superficie || prop.m2) || 0;
+      if (this.filterMinSize !== null && size < this.filterMinSize) {
+        return false;
+      }
+      if (this.filterMaxSize !== null && size > this.filterMaxSize) {
+        return false;
+      }
+
+      // 4d. Filtrar por Extras/Comodidades (Filtros Adicionales)
+      const desc = (prop.description || prop.descripcion || '').toLowerCase();
+
+      if (this.filterHasPool) {
+        const hasPool = prop.residence?.pool || prop.pool || prop.hasPool || desc.includes('piscina');
+        if (!hasPool) return false;
+      }
+
+      if (this.filterHasGarden) {
+        const hasGarden = prop.residence?.garden || prop.garden || prop.hasGarden || desc.includes('jardín') || desc.includes('jardin');
+        if (!hasGarden) return false;
+      }
+
+      if (this.filterHasTerrace) {
+        const hasTerrace = prop.residence?.terrace || prop.terrace || prop.hasTerrace || desc.includes('terraza');
+        if (!hasTerrace) return false;
+      }
+
+      if (this.filterHasElevator) {
+        const hasElevator = prop.residence?.elevator || prop.elevator || prop.hasElevator || desc.includes('ascensor');
+        if (!hasElevator) return false;
+      }
+
+      if (this.filterHasAC) {
+        const hasAC = prop.residence?.ac || prop.ac || prop.hasAc || desc.includes('aire') || desc.includes('climatizado');
+        if (!hasAC) return false;
+      }
+
       return true;
     });
 
@@ -221,6 +291,14 @@ export class PropertiesComponent implements OnInit {
     this.filterMaxPrice = null;
     this.filterBeds = '';
     this.filterSort = '';
+    this.filterBaths = '';
+    this.filterMinSize = null;
+    this.filterMaxSize = null;
+    this.filterHasPool = false;
+    this.filterHasGarden = false;
+    this.filterHasTerrace = false;
+    this.filterHasElevator = false;
+    this.filterHasAC = false;
     this.applyFilters();
   }
 }
