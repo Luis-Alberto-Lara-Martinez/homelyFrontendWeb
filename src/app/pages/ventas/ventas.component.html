@@ -12,13 +12,13 @@
     <div class="mb-10 text-center">
       <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-brand-blue/10 text-brand-blue mb-4 border border-brand-blue/20 shadow-sm">
         <span class="w-1.5 h-1.5 rounded-full bg-brand-blue animate-ping"></span>
-        Portal de Propietarios
+        Administrador de Propiedades
       </span>
       <h1 class="text-4xl md:text-5xl font-extrabold text-brand-dark tracking-tight mb-4">
-        Crea tu anuncio <span class="text-gradient-brand">premium</span>
+        Registrar nuevo <span class="text-gradient-brand">inmueble</span>
       </h1>
       <p class="text-gray-600 text-lg max-w-xl mx-auto leading-relaxed">
-        Completa este sencillo formulario paso a paso y publica tu inmueble ante miles de compradores y arrendatarios hoy mismo.
+        Completa el asistente paso a paso para dar de alta y publicar una nueva propiedad en el catálogo de la plataforma.
       </p>
     </div>
 
@@ -322,8 +322,8 @@
         <!-- Paso 4: Título y Descripción -->
         <div *ngIf="currentStep === 4" class="animate-fade-in space-y-8">
           <div>
-            <h2 class="text-2xl font-bold text-brand-dark mb-1">Título y descripción detallada</h2>
-            <p class="text-gray-500 text-sm mb-6">Describe de forma atractiva tu inmueble para captar un mayor interés rápidamente.</p>
+            <h2 class="text-2xl font-bold text-brand-dark mb-1">Título y descripción de la ficha</h2>
+            <p class="text-gray-500 text-sm mb-6">Introduce el título comercial y la descripción detallada para la publicación del inmueble.</p>
             
             <div class="space-y-6">
               <div>
@@ -335,14 +335,14 @@
                   <input type="text" [(ngModel)]="formData.titulo" placeholder="Ej: Espectacular ático luminoso con terraza"
                          class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-12 pr-4 py-4 text-gray-800 font-semibold outline-none focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all duration-200">
                 </div>
-                <p class="text-xs text-gray-400 mt-2 font-medium">Un buen título describe brevemente lo mejor de tu inmueble y capta la atención del usuario.</p>
+                <p class="text-xs text-gray-400 mt-2 font-medium">El título resumirá lo más destacado del inmueble en el catálogo público.</p>
               </div>
 
               <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Descripción de la propiedad</label>
-                <textarea [(ngModel)]="formData.descripcion" rows="6" placeholder="Describe lo mejor de tu inmueble, la zona, luminosidad, distribución, servicios cercanos..."
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Descripción del inmueble</label>
+                <textarea [(ngModel)]="formData.descripcion" rows="6" placeholder="Describe la distribución, estado, luminosidad, servicios de la zona, etc..."
                           class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl px-4 py-4 text-gray-800 font-medium outline-none focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all duration-200 resize-none leading-relaxed"></textarea>
-                <p class="text-xs text-gray-400 mt-2 font-medium">Explica con detalle todo lo que hace especial a tu inmueble. Los anuncios detallados reciben hasta un 50% más de visitas interesadas.</p>
+                <p class="text-xs text-gray-400 mt-2 font-medium">Explica detalladamente la distribución física, calidades y condiciones especiales de la propiedad.</p>
               </div>
             </div>
           </div>
@@ -351,19 +351,19 @@
         <!-- Paso 5: Establecer Precio -->
         <div *ngIf="currentStep === 5" class="animate-fade-in space-y-8">
           <div>
-            <h2 class="text-2xl font-bold text-brand-dark mb-1">¿Cuál es el precio de salida?</h2>
-            <p class="text-gray-500 text-sm mb-6">Elige una cifra competitiva acorde al mercado inmobiliario actual de la zona.</p>
+            <h2 class="text-2xl font-bold text-brand-dark mb-1">Precio comercial de salida</h2>
+            <p class="text-gray-500 text-sm mb-6">Establece el importe de cotización inicial para el inmueble en el catálogo.</p>
             
             <div class="space-y-6">
               <div class="bg-brand-blue/5 border border-brand-blue/10 rounded-3xl p-8 max-w-xl mx-auto shadow-sm">
-                <label class="block text-xs font-bold uppercase tracking-wider text-brand-blue mb-3 text-center">Precio de {{formData.operacion === 'venta' ? 'venta final' : 'mensualidad de alquiler'}}</label>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-blue mb-3 text-center">Precio de {{formData.operacion === 'venta' ? 'venta final' : 'alquiler mensual'}}</label>
                 <div class="relative max-w-xs mx-auto">
                   <span class="absolute left-5 top-1/2 -translate-y-1/2 text-brand-blue font-black text-3xl select-none">€</span>
                   <input type="number" min="0" [(ngModel)]="formData.precio" placeholder="250000"
                          class="w-full bg-white border-2 border-brand-blue/20 rounded-2xl pl-12 pr-4 py-5 text-brand-blue outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all font-bold text-3xl tracking-tight text-center shadow-inner">
                 </div>
                 <p class="text-xs text-gray-400 mt-4 text-center font-medium leading-relaxed">
-                  Establece un precio competitivo acorde a la zona para captar más compradores rápidamente e iniciar negociaciones más eficaces.
+                  Este valor será tomado como referencia para las búsquedas filtradas y el cálculo automatizado de viabilidad financiera.
                 </p>
               </div>
             </div>
@@ -373,8 +373,8 @@
         <!-- Paso 6: Multimedia (Fotos) -->
         <div *ngIf="currentStep === 6" class="animate-fade-in space-y-8">
           <div>
-            <h2 class="text-2xl font-bold text-brand-dark mb-1">Sube las mejores fotos de tu propiedad</h2>
-            <p class="text-gray-500 text-sm mb-6">Los anuncios con fotos de alta calidad e iluminadas reciben hasta un 80% más de contactos.</p>
+            <h2 class="text-2xl font-bold text-brand-dark mb-1">Carga de archivos fotográficos</h2>
+            <p class="text-gray-500 text-sm mb-6">Añade imágenes de alta calidad que representen con fidelidad el estado actual de las estancias.</p>
             
             <div class="border-2 border-dashed border-brand-blue/20 bg-brand-blue/5 hover:bg-brand-blue/10 rounded-3xl p-12 flex flex-col items-center justify-center text-center hover:border-brand-blue/50 transition-all duration-300 cursor-pointer group shadow-inner">
               <div class="w-20 h-20 bg-white text-brand-blue rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-gray-100 group-hover:scale-110 transition-transform duration-300">
@@ -382,12 +382,12 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
               </div>
-              <h3 class="text-xl font-bold text-gray-800 mb-1.5">Añadir fotografías del inmueble</h3>
-              <p class="text-gray-400 text-sm mb-6 font-medium">Arrastra tus archivos aquí o haz clic para explorar en tu ordenador</p>
+              <h3 class="text-xl font-bold text-gray-800 mb-1.5">Adjuntar imágenes del inmueble</h3>
+              <p class="text-gray-400 text-sm mb-6 font-medium">Arrastra los archivos fotográficos aquí o haz clic para buscarlos en el equipo</p>
               <span class="bg-white border border-gray-200 text-gray-700 px-8 py-3.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200 group-hover:-translate-y-0.5 transform active:scale-95">
-                Explorar archivos
+                Seleccionar archivos
               </span>
-              <p class="text-xs text-gray-400 mt-6 font-semibold">Formatos permitidos: JPG, PNG • Máx: 10MB por imagen</p>
+              <p class="text-xs text-gray-400 mt-6 font-semibold">Formatos permitidos: JPG, PNG • Máx: 10MB por archivo</p>
             </div>
           </div>
         </div>
@@ -395,12 +395,12 @@
         <!-- Paso 7: Contacto y Confirmación -->
         <div *ngIf="currentStep === 7" class="animate-fade-in space-y-8">
           <div>
-            <h2 class="text-2xl font-bold text-brand-dark mb-1">Datos de contacto finales</h2>
-            <p class="text-gray-500 text-sm mb-6">Último paso antes de publicar. Introduce tu número para recibir llamadas de interesados.</p>
+            <h2 class="text-2xl font-bold text-brand-dark mb-1">Contacto y confirmación de registro</h2>
+            <p class="text-gray-500 text-sm mb-6">Asigna el número telefónico para la recepción directa de solicitudes de visita o información.</p>
             
             <div class="space-y-6 max-w-md mx-auto bg-gray-50/50 border border-gray-100 p-8 rounded-3xl shadow-inner">
               <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Teléfono de contacto</label>
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Teléfono de contacto asignado</label>
                 <div class="relative">
                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 flex items-center gap-1">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
@@ -410,7 +410,7 @@
                          class="w-full bg-white border border-gray-200 rounded-2xl pl-20 pr-4 py-4 text-gray-800 font-extrabold text-lg outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all tracking-wide">
                 </div>
                 <p class="text-xs text-gray-400 mt-3 font-medium leading-relaxed">
-                  Tu número de teléfono solo será visible para aquellos usuarios debidamente registrados en el portal que muestren un interés legítimo de compra/alquiler.
+                  Este número será publicado en la ficha de catálogo para centralizar el flujo de llamadas de los clientes y leads de la plataforma.
                 </p>
               </div>
             </div>
@@ -430,13 +430,15 @@
         <button *ngIf="currentStep < totalSteps" 
                 (click)="nextStep()"
                 type="button"
-                class="w-full sm:w-auto px-12 py-4 rounded-2xl font-black text-white bg-gradient-brand hover:opacity-95 shadow-lg shadow-brand-blue/20 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer text-center">
+                [disabled]="!isStepValid(currentStep)"
+                class="w-full sm:w-auto px-12 py-4 rounded-2xl font-black text-white bg-gradient-brand hover:opacity-95 shadow-lg shadow-brand-blue/20 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none">
           Continuar
         </button>
 
         <button *ngIf="currentStep === totalSteps"
                 type="button"
-                class="w-full sm:w-auto px-12 py-4 rounded-2xl font-black text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/35 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer">
+                [disabled]="!isStepValid(currentStep)"
+                class="w-full sm:w-auto px-12 py-4 rounded-2xl font-black text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/35 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none">
           <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
           Publicar Anuncio
         </button>

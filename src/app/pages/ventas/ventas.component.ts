@@ -70,7 +70,34 @@ export class VentasComponent {
     }
   }
 
+  isStepValid(step: number): boolean {
+    switch(step) {
+      case 1:
+        return !!this.formData.tipoVivienda && !!this.formData.operacion;
+      case 2:
+        return !!this.formData.latitud && !!this.formData.longitud;
+      case 3:
+        return !!this.formData.metros && Number(this.formData.metros) > 0;
+      case 4:
+        return !!this.formData.titulo?.trim() && !!this.formData.descripcion?.trim();
+      case 5:
+        return !!this.formData.precio && Number(this.formData.precio) > 0;
+      case 6:
+        return true; // Multimedia es opcional
+      case 7:
+        return !!this.formData.telefono?.trim() && this.formData.telefono.replace(/\s+/g, '').length >= 9;
+      default:
+        return true;
+    }
+  }
+
   nextStep() {
+    if (!this.isStepValid(this.currentStep)) {
+      if (this.currentStep === 2) {
+        this.locationError = 'Debe buscar y obtener la ubicación exacta del inmueble en el mapa antes de continuar.';
+      }
+      return;
+    }
     if (this.currentStep < this.totalSteps) {
       this.currentStep++;
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -94,45 +121,83 @@ export class VentasComponent {
   async buscarUbicacion() {
     if (!this.formData.direccion || !this.formData.ciudad) {
       this.locationError = 'Por favor, introduce la dirección y ciudad completas.';
+      this.formData.latitud = '';
+      this.formData.longitud = '';
       return;
     }
 
     this.isSearchingLocation = true;
     this.locationError = '';
-
-    const query = `${this.formData.direccion}, ${this.formData.ciudad}, ${this.formData.codigoPostal || ''}, España`;
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    this.cdr.detectChanges();
 
     try {
-      const response = await fetch(url, { signal: controller.signal });
-      if (!response.ok) {
-        throw new Error('Respuesta no válida del servidor');
-      }
-      const data = await response.json();
-      if (data && data.length > 0) {
-        this.formData.latitud = data[0].lat;
-        this.formData.longitud = data[0].lon;
+      let lat = '';
+      let lon = '';
+
+      // 1. Intentar geocodificar con la dirección completa tal como se ha introducido
+      const query1 = `${this.formData.direccion}, ${this.formData.ciudad}, ${this.formData.codigoPostal || ''}, España`;
+      const data1 = await this.queryGeocode(query1);
+
+      if (data1 && data1.length > 0) {
+        lat = data1[0].lat;
+        lon = data1[0].lon;
       } else {
-        this.locationError = 'No se pudo encontrar la ubicación exacta. Puedes introducir las coordenadas manualmente.';
+        // 2. Fallback: Si no encuentra nada, limpiar detalles de piso, puerta, bloque o letras
+        // En España es común poner "Calle Mayor 12, 3º B", lo cual rompe a Nominatim.
+        const direccionLimpia = this.formData.direccion
+          .split(',')[0] // Tomar la primera parte antes de la coma
+          .replace(/\s*(?:\d+)?\s*(?:º|ª|piso|puerta|letra|bloque|bloq|esc|escalera|izq|der|duplicado|dup).*$/i, '')
+          .trim();
+
+        if (direccionLimpia && direccionLimpia.toLowerCase() !== this.formData.direccion.trim().toLowerCase()) {
+          const query2 = `${direccionLimpia}, ${this.formData.ciudad}, España`;
+          const data2 = await this.queryGeocode(query2);
+          if (data2 && data2.length > 0) {
+            lat = data2[0].lat;
+            lon = data2[0].lon;
+          }
+        }
+      }
+
+      if (lat && lon) {
+        this.formData.latitud = lat;
+        this.formData.longitud = lon;
+      } else {
+        this.locationError = 'No se ha podido encontrar la dirección exacta en el mapa. Revisa el nombre de la calle e inténtalo de nuevo.';
         this.formData.latitud = '';
         this.formData.longitud = '';
       }
     } catch (error: any) {
       console.error(error);
-      if (error.name === 'AbortError') {
-        this.locationError = 'La búsqueda de dirección ha tardado demasiado. Introduce las coordenadas manualmente.';
-      } else {
-        this.locationError = 'Error al buscar la ubicación. Introduce las coordenadas manualmente.';
-      }
+      this.locationError = 'Error de conexión con el servicio de mapas. Comprueba tu conexión a internet o inténtalo más tarde.';
       this.formData.latitud = '';
       this.formData.longitud = '';
     } finally {
-      clearTimeout(timeoutId);
       this.isSearchingLocation = false;
       this.cdr.detectChanges();
+    }
+  }
+
+  private async queryGeocode(query: string): Promise<any[]> {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500); // Timeout rápido de 3.5 segundos
+
+    try {
+      const response = await fetch(url, { 
+        signal: controller.signal,
+        headers: {
+          'Accept-Language': 'es' // Forzar idioma español
+        }
+      });
+      if (!response.ok) {
+        return [];
+      }
+      return await response.json();
+    } catch (e) {
+      return [];
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
