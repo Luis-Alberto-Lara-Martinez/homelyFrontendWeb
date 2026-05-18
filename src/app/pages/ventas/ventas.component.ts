@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,12 +11,13 @@ import { FormsModule } from '@angular/forms';
 })
 export class VentasComponent {
   currentStep: number = 1;
-  totalSteps: number = 5;
+  totalSteps: number = 7;
 
   // Form Data
   formData = {
     tipoVivienda: 'casa',
     operacion: 'venta',
+    titulo: '',
     direccion: '',
     ciudad: '',
     codigoPostal: '',
@@ -61,8 +62,10 @@ export class VentasComponent {
       case 1: return 'Datos básicos del anuncio';
       case 2: return 'Ubicación del inmueble';
       case 3: return 'Características principales';
-      case 4: return 'Multimedia y fotografías';
-      case 5: return 'Precio y contacto';
+      case 4: return 'Título y descripción';
+      case 5: return 'Establecer precio';
+      case 6: return 'Multimedia y fotografías';
+      case 7: return 'Contacto y confirmación';
       default: return '';
     }
   }
@@ -85,6 +88,9 @@ export class VentasComponent {
     this.formData.tipoVivienda = tipo;
   }
 
+  private cdr = inject(ChangeDetectorRef);
+  private sanitizer = inject(DomSanitizer);
+
   async buscarUbicacion() {
     if (!this.formData.direccion || !this.formData.ciudad) {
       this.locationError = 'Por favor, introduce la dirección y ciudad completas.';
@@ -97,27 +103,38 @@ export class VentasComponent {
     const query = `${this.formData.direccion}, ${this.formData.ciudad}, ${this.formData.codigoPostal || ''}, España`;
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) {
+        throw new Error('Respuesta no válida del servidor');
+      }
       const data = await response.json();
       if (data && data.length > 0) {
         this.formData.latitud = data[0].lat;
         this.formData.longitud = data[0].lon;
       } else {
-        this.locationError = 'No se pudo encontrar la ubicación exacta.';
+        this.locationError = 'No se pudo encontrar la ubicación exacta. Puedes introducir las coordenadas manualmente.';
         this.formData.latitud = '';
         this.formData.longitud = '';
       }
-    } catch (error) {
-      this.locationError = 'Error al buscar la ubicación.';
+    } catch (error: any) {
+      console.error(error);
+      if (error.name === 'AbortError') {
+        this.locationError = 'La búsqueda de dirección ha tardado demasiado. Introduce las coordenadas manualmente.';
+      } else {
+        this.locationError = 'Error al buscar la ubicación. Introduce las coordenadas manualmente.';
+      }
       this.formData.latitud = '';
       this.formData.longitud = '';
     } finally {
+      clearTimeout(timeoutId);
       this.isSearchingLocation = false;
+      this.cdr.detectChanges();
     }
   }
-
-  private sanitizer = inject(DomSanitizer);
 
   get mapUrl(): SafeResourceUrl | string {
     if (this.formData.latitud && this.formData.longitud) {
