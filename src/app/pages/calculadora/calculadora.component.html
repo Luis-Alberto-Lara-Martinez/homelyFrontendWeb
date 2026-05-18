@@ -36,7 +36,7 @@
             <label class="font-black uppercase tracking-wider text-xs text-gray-400">Precio del inmueble</label>
             <div class="relative w-40">
               <input type="number" [(ngModel)]="precio" (input)="onPrecioChange()" 
-                class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 pl-4 pr-10 text-right font-bold text-brand-dark focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-lg">
+                class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 pl-4 pr-10 text-right font-bold text-brand-dark focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
               <span class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">€</span>
             </div>
           </div>
@@ -58,12 +58,12 @@
             <div class="flex gap-2 w-56 sm:w-64">
               <div class="relative flex-1">
                 <input type="number" [(ngModel)]="ahorroEuros" (input)="onAhorroEurosChange()" 
-                  class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 pl-4 pr-10 text-right font-bold text-brand-dark focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-base">
+                  class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 pl-4 pr-10 text-right font-bold text-brand-dark focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                 <span class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">€</span>
               </div>
               <div class="relative w-20 sm:w-24">
                 <input type="number" [(ngModel)]="ahorroPorcentaje" (input)="onAhorroPorcentajeChange()" 
-                  class="w-full border border-gray-100 bg-gray-100/60 rounded-2xl py-3 pl-3 pr-8 text-right font-bold text-brand-blue focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-base">
+                  class="w-full border border-gray-100 bg-gray-100/60 rounded-2xl py-3 pl-3 pr-8 text-right font-bold text-brand-blue focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                 <span class="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-brand-blue">%</span>
               </div>
             </div>
@@ -85,7 +85,7 @@
             <label class="font-black uppercase tracking-wider text-xs text-gray-400">Plazo de amortización</label>
             <div class="relative w-28">
               <input type="number" [(ngModel)]="plazoAnos" (input)="calculate()" 
-                class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 px-4 text-right font-bold text-brand-dark focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-lg">
+                class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 pl-4 pr-16 text-right font-bold text-brand-dark focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
               <span class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">años</span>
             </div>
           </div>
@@ -113,7 +113,7 @@
               </button>
               <div class="relative flex-1">
                 <input type="number" step="0.1" [(ngModel)]="interes" (input)="calculate()" 
-                  class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 pl-4 pr-10 text-center font-bold text-brand-dark focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-lg">
+                  class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 pl-4 pr-10 text-center font-bold text-brand-dark focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                 <span class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">%</span>
               </div>
               <button (click)="sumarInteres()" 
