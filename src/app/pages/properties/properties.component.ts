@@ -34,6 +34,7 @@ export class PropertiesComponent implements OnInit {
   private circle: any;
 
   // Filtros de búsqueda
+  filterKeyword: string = '';
   filterTransaction: string = '';
   filterType: string = '';
   filterMinPrice: number | null = null;
@@ -113,6 +114,10 @@ export class PropertiesComponent implements OnInit {
       this.filterTransaction = value;
     } else if (filterName === 'type') {
       this.filterType = value;
+      if (value !== '' && value !== 'residencia') {
+        this.filterBeds = '';
+        this.filterBaths = '';
+      }
     } else if (filterName === 'beds') {
       this.filterBeds = value;
     } else if (filterName === 'baths') {
@@ -139,6 +144,24 @@ export class PropertiesComponent implements OnInit {
       return this.sortOptions.find(o => o.value === this.filterSort)?.label || 'Destacados';
     }
     return '';
+  }
+
+  getActiveFiltersCount(): number {
+    let count = 0;
+    if (this.filterTransaction) count++;
+    if (this.filterType) count++;
+    if (this.filterMinPrice !== null) count++;
+    if (this.filterMaxPrice !== null) count++;
+    if (this.filterBeds) count++;
+    if (this.filterBaths) count++;
+    if (this.filterMinSize !== null) count++;
+    if (this.filterMaxSize !== null) count++;
+    if (this.filterHasPool) count++;
+    if (this.filterHasGarden) count++;
+    if (this.filterHasTerrace) count++;
+    if (this.filterHasElevator) count++;
+    if (this.filterHasAC) count++;
+    return count;
   }
 
   loadPropertyTypes() {
@@ -254,6 +277,27 @@ export class PropertiesComponent implements OnInit {
 
   applyFilters() {
     let filtered = this.allProperties.filter((prop: any) => {
+      // 0. Filtrar por Palabra Clave (Buscador Superior)
+      if (this.filterKeyword) {
+        const query = this.filterKeyword.toLowerCase().trim();
+        const title = (prop.title || '').toLowerCase();
+        const desc = (prop.description || prop.descripcion || '').toLowerCase();
+        let addressStr = '';
+        if (prop.address) {
+          if (typeof prop.address === 'object') {
+            addressStr = `${prop.address.street || ''} ${prop.address.city || ''} ${prop.address.province || ''}`.toLowerCase();
+          } else {
+            addressStr = prop.address.toLowerCase();
+          }
+        } else if (prop.location) {
+          addressStr = prop.location.toLowerCase();
+        }
+        
+        if (!title.includes(query) && !desc.includes(query) && !addressStr.includes(query)) {
+          return false;
+        }
+      }
+
       // 1. Filtrar por Operación (Venta / Alquiler)
       if (this.filterTransaction) {
         const propTrans = (prop.transaction || prop.operacion || prop.status || '').toLowerCase();
@@ -363,6 +407,7 @@ export class PropertiesComponent implements OnInit {
   }
 
   resetFilters() {
+    this.filterKeyword = '';
     this.filterTransaction = '';
     this.filterType = '';
     this.filterMinPrice = null;
