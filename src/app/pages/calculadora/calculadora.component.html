@@ -1,196 +1,298 @@
-<section class="pt-32 pb-16 bg-gray-50 min-h-screen">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h1 class="text-3xl md:text-4xl font-extrabold text-brand-dark mb-8 text-center md:text-left">Simulador de hipoteca</h1>
+<div class="min-h-screen bg-slate-50 pt-32 pb-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Header de la calculadora -->
+    <div class="text-center md:text-left mb-12">
+      <span class="inline-block text-xs font-black uppercase tracking-[0.3em] text-brand-blue mb-3 bg-brand-blue/5 px-4 py-1.5 rounded-full border border-brand-blue/10">Herramienta Financiera</span>
+      <h1 class="text-4xl font-extrabold text-brand-dark tracking-tight">Simulador de <span class="text-gradient-brand">Hipoteca</span></h1>
+      <p class="text-gray-500 mt-2 text-base max-w-xl">Calcula tu cuota mensual de forma instantánea y descubre el desglose detallado de los gastos asociados a la compra de tu propiedad.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       
-      <!-- Left Column: Form -->
-      <div class="lg:col-span-7 space-y-8 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+      <!-- Columna Izquierda: Parámetros del préstamo -->
+      <div class="lg:col-span-7 space-y-8 bg-white p-6 md:p-10 rounded-[2.5rem] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] border border-gray-100/80">
         
-        <!-- Precio del inmueble -->
-        <div>
-          <div class="flex justify-between items-center mb-4">
-            <label class="font-bold text-gray-800">Precio del inmueble</label>
-            <div class="relative w-32 md:w-40">
-              <input type="number" [(ngModel)]="precio" (change)="onPrecioChange()" class="w-full border border-gray-200 rounded-lg py-2 pl-3 pr-8 text-right font-medium outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-all">
-              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">€</span>
-            </div>
+        <!-- Segmented Control: Tipo de Vivienda -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-gray-100 gap-4">
+          <span class="font-bold text-brand-dark text-lg">Tipo de vivienda</span>
+          <div class="grid grid-cols-2 p-1 bg-gray-100 rounded-2xl w-full sm:w-80">
+            <button (click)="tipoVivienda = 'segunda'; calculate()" 
+              [class]="tipoVivienda === 'segunda' ? 'bg-white text-brand-blue shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+              class="py-2.5 px-4 rounded-xl text-sm font-bold transition-all text-center">
+              Segunda mano
+            </button>
+            <button (click)="tipoVivienda = 'nueva'; calculate()" 
+              [class]="tipoVivienda === 'nueva' ? 'bg-white text-brand-blue shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+              class="py-2.5 px-4 rounded-xl text-sm font-bold transition-all text-center">
+              Obra nueva
+            </button>
           </div>
-          <input type="range" min="50000" max="1000000" step="5000" [(ngModel)]="precio" (input)="onPrecioChange()" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-blue">
         </div>
 
-        <!-- Ahorro aportado -->
-        <div>
-          <div class="flex justify-between items-center mb-4">
-            <label class="font-bold text-gray-800">Ahorro aportado</label>
-            <div class="flex gap-2 w-48 md:w-56">
+        <!-- Parámetro 1: Precio del Inmueble -->
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <label class="font-black uppercase tracking-wider text-xs text-gray-400">Precio del inmueble</label>
+            <div class="relative w-40">
+              <input type="number" [(ngModel)]="precio" (input)="onPrecioChange()" 
+                class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 pl-4 pr-10 text-right font-bold text-brand-dark focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-lg">
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">€</span>
+            </div>
+          </div>
+          <div class="relative pt-2">
+            <input type="range" min="50000" max="1000000" step="5000" [(ngModel)]="precio" (input)="onPrecioChange()" 
+              class="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-brand-blue">
+            <div class="flex justify-between text-[10px] font-bold text-gray-400 mt-2 px-1">
+              <span>50.000 €</span>
+              <span>500.000 €</span>
+              <span>1.000.000 €</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parámetro 2: Ahorro aportado (Entrada) -->
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <label class="font-black uppercase tracking-wider text-xs text-gray-400">Ahorro aportado (Entrada)</label>
+            <div class="flex gap-2 w-56 sm:w-64">
               <div class="relative flex-1">
-                <input type="number" [(ngModel)]="ahorroEuros" (change)="onAhorroEurosChange()" class="w-full border border-gray-200 rounded-lg py-2 pl-3 pr-8 text-right font-medium outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-all">
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">€</span>
+                <input type="number" [(ngModel)]="ahorroEuros" (input)="onAhorroEurosChange()" 
+                  class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 pl-4 pr-10 text-right font-bold text-brand-dark focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-base">
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">€</span>
               </div>
-              <div class="relative w-20">
-                <input type="number" [(ngModel)]="ahorroPorcentaje" (change)="onAhorroPorcentajeChange()" class="w-full border border-gray-200 rounded-lg py-2 pl-2 pr-6 text-right font-medium outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-all bg-gray-50">
-                <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">%</span>
+              <div class="relative w-20 sm:w-24">
+                <input type="number" [(ngModel)]="ahorroPorcentaje" (input)="onAhorroPorcentajeChange()" 
+                  class="w-full border border-gray-100 bg-gray-100/60 rounded-2xl py-3 pl-3 pr-8 text-right font-bold text-brand-blue focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-base">
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-brand-blue">%</span>
               </div>
             </div>
           </div>
-          <input type="range" min="0" max="100" step="1" [(ngModel)]="ahorroPorcentaje" (input)="onAhorroPorcentajeChange()" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-blue">
-        </div>
-
-        <!-- Plazo -->
-        <div>
-          <div class="flex justify-between items-center mb-4">
-            <label class="font-bold text-gray-800">Plazo en años</label>
-            <div class="relative w-20">
-              <input type="number" [(ngModel)]="plazoAnos" (change)="calculate()" class="w-full border border-gray-200 rounded-lg py-2 px-3 text-right font-medium outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-all">
+          <div class="relative pt-2">
+            <input type="range" min="0" max="100" step="1" [(ngModel)]="ahorroPorcentaje" (input)="onAhorroPorcentajeChange()" 
+              class="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-brand-blue">
+            <div class="flex justify-between text-[10px] font-bold text-gray-400 mt-2 px-1">
+              <span>0%</span>
+              <span>50%</span>
+              <span>100%</span>
             </div>
           </div>
-          <input type="range" min="5" max="40" step="1" [(ngModel)]="plazoAnos" (input)="calculate()" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-blue">
         </div>
 
-        <!-- Tipo de interés & Localización -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Parámetro 3: Plazo -->
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <label class="font-black uppercase tracking-wider text-xs text-gray-400">Plazo de amortización</label>
+            <div class="relative w-28">
+              <input type="number" [(ngModel)]="plazoAnos" (input)="calculate()" 
+                class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 px-4 text-right font-bold text-brand-dark focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-lg">
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">años</span>
+            </div>
+          </div>
+          <div class="relative pt-2">
+            <input type="range" min="5" max="40" step="1" [(ngModel)]="plazoAnos" (input)="calculate()" 
+              class="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-brand-blue">
+            <div class="flex justify-between text-[10px] font-bold text-gray-400 mt-2 px-1">
+              <span>5 años</span>
+              <span>20 años</span>
+              <span>40 años</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parámetros Secundarios: Tipo de Interés y Localización -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          
+          <!-- Interés -->
           <div class="flex flex-col gap-3">
-            <label class="font-bold text-gray-800">Tipo de interés</label>
+            <label class="font-black uppercase tracking-wider text-xs text-gray-400">Tipo de interés (TIN)</label>
             <div class="flex items-center gap-2">
-              <button (click)="restarInteres()" class="w-10 h-10 flex items-center justify-center rounded-lg border border-brand-blue text-brand-blue hover:bg-brand-blue/10 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+              <button (click)="restarInteres()" 
+                class="w-12 h-12 flex items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 hover:bg-brand-blue/5 text-brand-blue hover:border-brand-blue/20 transition-all font-bold text-lg shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"></path></svg>
               </button>
               <div class="relative flex-1">
-                <input type="number" step="0.1" [(ngModel)]="interes" (change)="calculate()" class="w-full border border-gray-200 rounded-lg py-2 pl-3 pr-6 text-center font-medium outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-all">
-                <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">%</span>
+                <input type="number" step="0.1" [(ngModel)]="interes" (input)="calculate()" 
+                  class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 pl-4 pr-10 text-center font-bold text-brand-dark focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-lg">
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">%</span>
               </div>
-              <button (click)="sumarInteres()" class="w-10 h-10 flex items-center justify-center rounded-lg border border-brand-blue text-brand-blue hover:bg-brand-blue/10 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              <button (click)="sumarInteres()" 
+                class="w-12 h-12 flex items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 hover:bg-brand-blue/5 text-brand-blue hover:border-brand-blue/20 transition-all font-bold text-lg shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
               </button>
             </div>
           </div>
 
+          <!-- Localización -->
           <div class="flex flex-col gap-3">
-            <label class="font-bold text-gray-800">Localización del inmueble</label>
-            <select [(ngModel)]="localizacion" (change)="calculate()" class="w-full border border-gray-200 rounded-lg py-2 px-3 bg-white font-medium outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-all cursor-pointer">
-              <option value="madrid">Madrid</option>
-              <option value="cataluna">Cataluña</option>
-              <option value="andalucia">Andalucía</option>
-              <option value="valencia">Comunidad Valenciana</option>
-              <option value="otros">Otra Comunidad</option>
-            </select>
+            <label class="font-black uppercase tracking-wider text-xs text-gray-400">Comunidad Autónoma</label>
+            <div class="relative">
+              <select [(ngModel)]="localizacion" (change)="calculate()" 
+                class="w-full border border-gray-100 bg-gray-50/50 rounded-2xl py-3 px-4 text-brand-dark font-bold focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all text-base cursor-pointer appearance-none">
+                <option value="madrid">Madrid</option>
+                <option value="cataluna">Cataluña</option>
+                <option value="andalucia">Andalucía</option>
+                <option value="valencia">Comunidad Valenciana</option>
+                <option value="otros">Otra Comunidad</option>
+              </select>
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+              </span>
+            </div>
           </div>
         </div>
 
-        <!-- Tipo vivienda -->
-        <div class="flex items-center justify-between pt-2">
-          <label class="font-bold text-gray-800">Tipo de vivienda</label>
-          <div class="flex gap-4">
-            <label class="flex items-center cursor-pointer group">
-              <input type="radio" name="tipoVivienda" value="segunda" [(ngModel)]="tipoVivienda" (change)="calculate()" class="w-5 h-5 text-brand-blue focus:ring-brand-blue cursor-pointer">
-              <span class="ml-2 text-gray-700 group-hover:text-brand-blue transition-colors">Segunda mano</span>
-            </label>
-            <label class="flex items-center cursor-pointer group">
-              <input type="radio" name="tipoVivienda" value="nueva" [(ngModel)]="tipoVivienda" (change)="calculate()" class="w-5 h-5 text-brand-blue focus:ring-brand-blue cursor-pointer">
-              <span class="ml-2 text-gray-700 group-hover:text-brand-blue transition-colors">Obra nueva</span>
-            </label>
+        <!-- Interactive Visual Progress Indicator -->
+        <div class="space-y-3 pt-4">
+          <div class="flex justify-between text-xs font-bold text-gray-400 uppercase tracking-wider">
+            <span>Distribución de la Compra</span>
           </div>
-        </div>
-
-        <!-- Cuota summary left -->
-        <div class="bg-brand-blue/10 rounded-xl p-4 flex justify-between items-center border border-brand-blue/20">
-          <span class="font-bold text-brand-dark">Cuota mensual estimada</span>
-          <span class="font-extrabold text-brand-dark text-xl">{{cuotaMensual | number:'1.0-0'}} €</span>
-        </div>
-
-        <!-- CTA CaixaBank imitation -->
-        <div class="border border-gray-200 rounded-xl p-6 mt-6 shadow-sm">
-          <h3 class="font-extrabold text-gray-800 text-lg mb-2">¿Ya estás buscando financiación?</h3>
-          <p class="text-gray-500 mb-6">Te ayudamos a encontrar la opción que mejor se adapta a ti.</p>
-          <button class="bg-brand-blue text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-blue/90 transition-colors shadow-md">
-            Calcula tu hipoteca
-          </button>
+          <div class="h-4 bg-gray-100 rounded-full overflow-hidden flex shadow-inner">
+            <div [style.width.%]="porcentajeFinanciacion" class="bg-brand-blue transition-all duration-500" title="Hipoteca"></div>
+            <div [style.width.%]="ahorroPorcentaje" class="bg-brand-purple/60 transition-all duration-500" title="Ahorro"></div>
+            <div [style.width.%]="(impuestos/precio)*100" class="bg-amber-400 transition-all duration-500" title="Gastos/Impuestos"></div>
+          </div>
+          <div class="flex flex-wrap gap-4 text-xs font-bold mt-2">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 bg-brand-blue rounded-full"></span>
+              <span class="text-gray-600">Hipoteca ({{porcentajeFinanciacion | number:'1.0-0'}}%)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 bg-brand-purple/60 rounded-full"></span>
+              <span class="text-gray-600">Ahorro aportado ({{ahorroPorcentaje | number:'1.0-0'}}%)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 bg-amber-400 rounded-full"></span>
+              <span class="text-gray-600">Impuestos y Gastos ({{(impuestos/precio)*100 | number:'1.0-1'}}%)</span>
+            </div>
+          </div>
         </div>
 
       </div>
 
-      <!-- Right Column: Results -->
+      <!-- Columna Derecha: Tarjeta de resultados -->
       <div class="lg:col-span-5 space-y-6">
         
-        <!-- Big Result Card -->
-        <div class="bg-blue-50/80 rounded-2xl p-6 border border-brand-blue/10">
-          <div class="flex justify-between items-start mb-2">
-            <span class="text-brand-blue font-bold">Cuota mensual</span>
-            <span class="text-brand-blue font-medium text-sm">Durante {{plazoAnos}} años ({{plazoAnos * 12}} cuotas)</span>
-          </div>
-          <div class="text-5xl font-extrabold text-brand-blue mb-8">
-            {{cuotaMensual | number:'1.0-0'}} €
-          </div>
+        <!-- Hero Result Card: Monthly Payment -->
+        <div class="relative bg-gradient-to-br from-brand-blue to-blue-700 rounded-[2.5rem] p-8 text-white shadow-[0_20px_50px_-20px_rgba(37,99,235,0.3)] border border-brand-blue/10 overflow-hidden group">
+          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
+          <div class="absolute -left-10 -top-10 w-40 h-40 bg-blue-900/20 rounded-full blur-2xl"></div>
 
-          <div class="space-y-4 pt-4 border-t border-brand-blue/10">
-            <div class="flex justify-between items-center">
-              <span class="text-gray-700">Importe de la hipoteca</span>
-              <span class="font-bold text-gray-900">{{importeHipoteca | number:'1.0-0'}} €</span>
+          <div class="relative z-10 space-y-6">
+            <div class="flex justify-between items-center border-b border-white/10 pb-4">
+              <div>
+                <span class="text-xs font-black uppercase tracking-[0.2em] text-blue-200">Cuota mensual</span>
+                <p class="text-xs text-blue-100/80 mt-1">Interés fijo: {{interes}}% | {{plazoAnos}} años</p>
+              </div>
+              <span class="bg-white/10 border border-white/15 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                {{plazoAnos * 12}} meses
+              </span>
             </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-700">Porcentaje de financiación</span>
-              <span class="font-bold text-gray-900">{{porcentajeFinanciacion | number:'1.0-0'}}%</span>
+
+            <div class="py-2">
+              <div class="text-6xl font-black tracking-tight select-none">
+                {{cuotaMensual | number:'1.0-0'}}<span class="text-3xl font-light text-blue-200"> €/mes</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-white/10 text-sm">
+              <div>
+                <p class="text-blue-200 text-xs font-bold uppercase tracking-wider">Préstamo solicitado</p>
+                <p class="font-extrabold text-lg mt-0.5">{{importeHipoteca | number:'1.0-0'}} €</p>
+              </div>
+              <div>
+                <p class="text-blue-200 text-xs font-bold uppercase tracking-wider">Financiación</p>
+                <p class="font-extrabold text-lg mt-0.5">{{porcentajeFinanciacion | number:'1.0-0'}}%</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Summary Coste -->
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <!-- Breakdown Card: Desglose de Gastos -->
+        <div class="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] border border-gray-100/80 space-y-6">
+          <h3 class="font-black text-brand-dark text-lg uppercase tracking-wider border-b border-gray-50 pb-4">Desglose de la operación</h3>
+          
           <div class="space-y-4">
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">Precio del inmueble:</span>
-              <span class="font-medium text-gray-900">{{precio | number:'1.0-0'}} €</span>
+            
+            <!-- Entrada -->
+            <div class="flex justify-between items-center py-2 border-b border-gray-50">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-brand-purple/10 flex items-center justify-center text-brand-purple">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </span>
+                <div>
+                  <span class="font-bold text-gray-700 text-sm">Ahorro necesario (Entrada)</span>
+                  <p class="text-[10px] text-gray-400 font-bold">Porcentaje del precio: {{ahorroPorcentaje}}%</p>
+                </div>
+              </div>
+              <span class="font-extrabold text-brand-dark text-base">{{ahorroEuros | number:'1.0-0'}} €</span>
             </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">Impuestos y gastos de la compra:</span>
-              <span class="font-medium text-gray-900">{{impuestos | number:'1.0-0'}} €</span>
+
+            <!-- Hipoteca -->
+            <div class="flex justify-between items-center py-2 border-b border-gray-50">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                </span>
+                <div>
+                  <span class="font-bold text-gray-700 text-sm">Capital financiado</span>
+                  <p class="text-[10px] text-gray-400 font-bold">Importe de la hipoteca</p>
+                </div>
+              </div>
+              <span class="font-extrabold text-brand-dark text-base">{{importeHipoteca | number:'1.0-0'}} €</span>
             </div>
-            <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
-              <span class="font-extrabold text-gray-900">Coste total del inmueble:</span>
-              <span class="font-extrabold text-gray-900">{{costeTotalInmueble | number:'1.0-0'}} €</span>
+
+            <!-- Impuestos y Gastos -->
+            <div class="flex justify-between items-center py-2 border-b border-gray-50">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                </span>
+                <div>
+                  <span class="font-bold text-gray-700 text-sm">Impuestos y Gastos</span>
+                  <p class="text-[10px] text-gray-400 font-bold">Gastos notariales, IVA, ITP e inscripciones</p>
+                </div>
+              </div>
+              <span class="font-extrabold text-brand-dark text-base">{{impuestos | number:'1.0-0'}} €</span>
             </div>
+
+            <!-- Intereses Totales -->
+            <div class="flex justify-between items-center py-2">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                </span>
+                <div>
+                  <span class="font-bold text-gray-700 text-sm">Intereses totales</span>
+                  <p class="text-[10px] text-gray-400 font-bold">Coste financiero por el plazo elegido</p>
+                </div>
+              </div>
+              <span class="font-extrabold text-brand-dark text-base">{{interesesTotales | number:'1.0-0'}} €</span>
+            </div>
+
           </div>
         </div>
 
-        <!-- Detailed Breakdown -->
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div class="space-y-6">
-            <div class="flex justify-between items-start">
-              <div>
-                <p class="font-bold text-gray-900">Ahorro aportado:</p>
-                <p class="text-xs text-gray-400">Entrada</p>
-              </div>
-              <span class="font-medium text-gray-900">{{ahorroEuros | number:'1.0-0'}} €</span>
+        <!-- Premium Totals Card -->
+        <div class="bg-gradient-to-br from-emerald-50 to-teal-50/60 rounded-[2.5rem] p-6 border border-emerald-100/50 shadow-sm space-y-4">
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Coste Total de la Vivienda</span>
+              <p class="text-[10px] text-emerald-600 mt-0.5">Precio de compra + Impuestos y gastos</p>
             </div>
-            
-            <div class="flex justify-between items-start">
-              <div>
-                <p class="font-bold text-gray-900">Importe de la hipoteca:</p>
-                <p class="text-xs text-gray-400">Capital a financiar</p>
-              </div>
-              <span class="font-medium text-gray-900">{{importeHipoteca | number:'1.0-0'}} €</span>
+            <span class="font-extrabold text-emerald-950 text-xl">{{costeTotalInmueble | number:'1.0-0'}} €</span>
+          </div>
+          <div class="h-px bg-emerald-100"></div>
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Coste Total con Hipoteca</span>
+              <p class="text-[10px] text-emerald-600 mt-0.5">Precio total + Intereses pagados</p>
             </div>
-
-            <div class="flex justify-between items-start">
-              <div>
-                <p class="font-bold text-gray-900">Intereses totales:</p>
-                <p class="text-xs text-gray-400">Coste del préstamo</p>
-              </div>
-              <span class="font-medium text-gray-900">{{interesesTotales | number:'1.0-0'}} €</span>
-            </div>
-
-            <div class="bg-teal-50 rounded-xl p-4 flex justify-between items-center border border-teal-100 mt-4">
-              <div>
-                <p class="font-bold text-brand-blue text-sm">Coste total con hipoteca</p>
-                <p class="text-[10px] text-gray-500 mt-1">Capital + intereses + impuestos y gastos</p>
-              </div>
-              <span class="font-extrabold text-brand-blue text-xl">{{costeTotalHipoteca | number:'1.0-0'}} €</span>
-            </div>
+            <span class="font-extrabold text-emerald-950 text-xl">{{costeTotalHipoteca | number:'1.0-0'}} €</span>
           </div>
         </div>
 
       </div>
     </div>
   </div>
-</section>
+</div>
