@@ -28,6 +28,11 @@ export const routes: Routes = [
     title: 'Homely - Recuperar Contraseña'
   },
   {
+    path: 'reset-password',
+    loadComponent: () => import('./pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent),
+    title: 'Homely - Restablecer Contraseña'
+  },
+  {
     path: 'trabaja-con-nosotros',
     component: TrabajaConNosotrosComponent,
     canActivate: [authGuard],

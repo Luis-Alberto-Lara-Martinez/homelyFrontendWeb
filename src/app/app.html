@@ -11,7 +11,7 @@
   <app-footer *ngIf="showHeaderFooter"></app-footer>
 
   <!-- Chatbot Window -->
-  <div *ngIf="isChatOpen"
+  <div *ngIf="isChatOpen && showHeaderFooter"
     class="fixed right-6 bottom-24 z-[60] w-[350px] sm:w-[400px] bg-white rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,96,90,0.3)] overflow-hidden flex flex-col border border-brand-blue/10 animate-fade-in-up"
     style="height: 600px; max-height: calc(100vh - 120px);">
 
@@ -78,7 +78,7 @@
   </div>
 
   <!-- Floating Button -->
-  <button (click)="toggleChat()"
+  <button *ngIf="showHeaderFooter" (click)="toggleChat()"
     [ngClass]="{'scale-90 opacity-0 pointer-events-none translate-y-4': isChatOpen, 'scale-100 opacity-100 translate-y-0': !isChatOpen}"
     class="fixed right-6 bottom-6 z-50 inline-flex items-center justify-center gap-3 rounded-full bg-gradient-brand px-6 py-4 text-base font-extrabold text-white shadow-2xl shadow-brand-blue/40 transition-all duration-300 hover:shadow-brand-blue/60 hover:-translate-y-1 focus:outline-none group"
     type="button" aria-label="Botón flotante de acción">
