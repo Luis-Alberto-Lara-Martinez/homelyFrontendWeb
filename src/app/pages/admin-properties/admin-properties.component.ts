@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Properties } from '../../services/properties/properties';
 
+import { RouterModule } from '@angular/router';
+
 // Triggering build
 @Component({
   selector: 'app-admin-properties',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './admin-properties.component.html'
 })
 export class AdminPropertiesComponent implements OnInit {
