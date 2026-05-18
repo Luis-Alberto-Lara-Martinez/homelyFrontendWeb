@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,9 +9,12 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, FormsModule],
   templateUrl: './ventas.component.html'
 })
-export class VentasComponent {
+export class VentasComponent implements OnDestroy {
   currentStep: number = 1;
   totalSteps: number = 7;
+
+  // Selected Images
+  selectedImages: { file: File, previewUrl: string }[] = [];
 
   // Form Data
   formData = {
@@ -207,5 +210,50 @@ export class VentasComponent {
       return this.sanitizer.bypassSecurityTrustResourceUrl(url);
     }
     return '';
+  }
+
+  ngOnDestroy() {
+    this.selectedImages.forEach(img => URL.revokeObjectURL(img.previewUrl));
+  }
+
+  onFilesSelected(event: any) {
+    const files = event.target.files;
+    if (files) {
+      this.addFiles(files);
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    const files = event.dataTransfer?.files;
+    if (files) {
+      this.addFiles(files);
+    }
+  }
+
+  private addFiles(files: FileList) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.type.startsWith('image/')) {
+        const previewUrl = URL.createObjectURL(file);
+        this.selectedImages.push({ file, previewUrl });
+      }
+    }
+    this.cdr.detectChanges();
+  }
+
+  removeImage(index: number) {
+    const img = this.selectedImages[index];
+    if (img) {
+      URL.revokeObjectURL(img.previewUrl);
+      this.selectedImages.splice(index, 1);
+    }
+    this.cdr.detectChanges();
   }
 }
