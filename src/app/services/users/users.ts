@@ -28,11 +28,12 @@ export class Users {
 
   oauth2login(idToken: string): Observable<any> {
     const headers: HttpHeaders = new HttpHeaders().set('Authorization', `Bearer ${idToken}`);
-    return this.http.post<any>(
-      `${environment.backendUrl}/oauth2/login`,
-      {},
-      { headers }
-    );
+    return this.http.post<any>(`${environment.backendUrl}/oauth2/login`, {}, { headers });
+  }
+
+  oauth2Register(idToken: string): Observable<any> {
+    const headers: HttpHeaders = new HttpHeaders().set('Authorization', `Bearer ${idToken}`);
+    return this.http.post<any>(`${environment.backendUrl}/oauth2/register`, {}, { headers });
   }
 
   // Registrar un nuevo usuario

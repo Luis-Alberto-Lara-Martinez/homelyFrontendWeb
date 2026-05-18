@@ -36,14 +36,14 @@ export class HeroComponent {
       this.selectedLatitude = null;
       this.selectedLongitude = null;
       this.zone.run(() => {
-        this.router.navigate(['/resultados-busqueda']);
+        this.router.navigate(['/propiedades']);
       });
       return;
     }
 
     if (this.selectedLatitude !== null && this.selectedLongitude !== null) {
       this.zone.run(() => {
-        this.router.navigate(['/resultados-busqueda'], {
+        this.router.navigate(['/propiedades'], {
           queryParams: {
             lat: this.selectedLatitude,
             lng: this.selectedLongitude,
@@ -64,7 +64,7 @@ export class HeroComponent {
         this.selectedLatitude = lat;
         this.selectedLongitude = lng;
         this.zone.run(() => {
-          this.router.navigate(['/resultados-busqueda'], {
+          this.router.navigate(['/propiedades'], {
             queryParams: {
               lat: lat,
               lng: lng,
@@ -75,21 +75,27 @@ export class HeroComponent {
       } else {
         // En caso de no encontrar coordenadas, redirigir al catálogo general
         this.zone.run(() => {
-          this.router.navigate(['/resultados-busqueda']);
+          this.router.navigate(['/propiedades']);
         });
       }
     } catch (err) {
       console.error('Error geocoding location input:', err);
       this.zone.run(() => {
-        this.router.navigate(['/resultados-busqueda']);
+        this.router.navigate(['/propiedades']);
       });
     }
   }
 
   openMapModal() {
     this.showMapModal = true;
+    if (this.location && !this.tempLocationData) {
+      this.searchQuery = this.location;
+    }
     setTimeout(() => {
       this.initMap();
+      if (this.searchQuery) {
+        this.searchCity();
+      }
       setTimeout(() => {
         if (this.map) {
           this.map.invalidateSize();
@@ -234,5 +240,10 @@ export class HeroComponent {
       this.location = this.tempLocationData;
     }
     this.closeMapModal();
+  }
+
+  applyAndSearch() {
+    this.applyLocation();
+    this.onSearchProperties();
   }
 }

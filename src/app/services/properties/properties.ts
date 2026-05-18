@@ -70,4 +70,16 @@ export class Properties {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.delete<any>(`${this.baseUrl}/${id}`, { headers });
   }
+
+  getAllPropertyTypes(): Observable<any[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${this.baseUrl}/types`, { headers });
+  }
+
+  getAllPropertyTransactions(): Observable<any[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${this.baseUrl}/transactions`, { headers });
+  }
 }

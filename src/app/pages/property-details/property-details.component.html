@@ -1,0 +1,384 @@
+<div class="min-h-screen bg-gray-50 pt-24 pb-12">
+  <!-- Breadcrumbs -->
+  <div class="max-w-7xl mx-auto px-4 mb-6">
+    <nav class="flex text-sm font-medium text-gray-500">
+      <a routerLink="/" class="hover:text-brand-blue transition-colors">Inicio</a>
+      <span class="mx-2">/</span>
+      <a [routerLink]="propertiesLink" queryParamsHandling="preserve"
+        class="hover:text-brand-blue transition-colors">Propiedades</a>
+      <span class="mx-2">/</span>
+      <span class="text-brand-dark">{{ property?.title }}</span>
+    </nav>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- Lado Izquierdo: Galería e Información -->
+      <div class="lg:col-span-2 space-y-8">
+
+        <!-- Galería de Imágenes Principal -->
+        <div class="relative rounded-3xl overflow-hidden shadow-2xl group select-none bg-slate-950">
+          <!-- Main Image -->
+          <img [src]="property?.images?.[activeImageIndex]" (click)="openLightbox()"
+            class="w-full h-[500px] object-cover transition-all duration-300 ease-in-out transform group-hover:scale-102 cursor-zoom-in"
+            [class.opacity-100]="isAnimating" [class.scale-98]="isAnimating" title="Ver imagen completa">
+
+          <!-- Badges -->
+          <div class="absolute top-6 left-6 flex gap-2 z-10">
+            <span
+              class="bg-brand-blue text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg">
+              {{ property?.status }}
+            </span>
+            <span
+              class="bg-white/90 backdrop-blur-md text-brand-dark text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg">
+              {{ property?.type }}
+            </span>
+          </div>
+
+          <!-- Image Counter badge -->
+          <div *ngIf="(property?.images?.length || 0) > 1"
+            class="absolute top-6 right-6 bg-brand-dark/75 backdrop-blur-md text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg z-10">
+            {{ activeImageIndex + 1 }} / {{ property?.images?.length }}
+          </div>
+
+          <!-- Navigation Arrows -->
+          <ng-container *ngIf="(property?.images?.length || 0) > 1">
+            <!-- Left Arrow -->
+            <button (click)="prevImage($event)"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white text-brand-dark rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 duration-200 z-10 focus:outline-none cursor-pointer">
+              <svg class="w-6 h-6 text-brand-dark animate-in fade-in" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <!-- Right Arrow -->
+            <button (click)="nextImage($event)"
+              class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white text-brand-dark rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 duration-200 z-10 focus:outline-none cursor-pointer">
+              <svg class="w-6 h-6 text-brand-dark animate-in fade-in" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </ng-container>
+
+          <!-- Progress Dots overlay at the bottom -->
+          <div *ngIf="(property?.images?.length || 0) > 1"
+            class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10 bg-brand-dark/30 px-4 py-2.5 rounded-full backdrop-blur-sm">
+            <button *ngFor="let img of property?.images; let idx = index" (click)="selectImage(idx, $event)"
+              class="w-2.5 h-2.5 rounded-full transition-all duration-300 focus:outline-none cursor-pointer"
+              [class.bg-white]="activeImageIndex === idx" [class.scale-125]="activeImageIndex === idx"
+              [class.bg-white/40]="activeImageIndex !== idx"></button>
+          </div>
+        </div>
+
+        <!-- Thumbnail list beneath the main image -->
+        <div *ngIf="(property?.images?.length || 0) > 1"
+          class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin select-none">
+          <button *ngFor="let img of property?.images; let idx = index" (click)="selectImage(idx, $event)"
+            class="relative w-24 h-16 rounded-xl overflow-hidden flex-shrink-0 transition-all duration-300 focus:outline-none border-2 shadow-sm hover:scale-105 active:scale-95 cursor-pointer"
+            [class.border-brand-blue]="activeImageIndex === idx" [class.border-transparent]="activeImageIndex !== idx"
+            [class.shadow-md]="activeImageIndex === idx">
+            <img [src]="img" class="w-full h-full object-cover">
+            <!-- Overlay to dim inactive thumbnails -->
+            <div *ngIf="activeImageIndex !== idx"
+              class="absolute inset-0 bg-brand-dark/15 hover:bg-transparent transition-colors"></div>
+          </button>
+        </div>
+
+        <!-- Información General -->
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+              <h1 class="text-4xl font-black text-brand-dark leading-tight">{{ property?.title }}</h1>
+              <p class="text-gray-500 flex items-center gap-2 mt-2">
+                <svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {{ property?.location }}
+              </p>
+            </div>
+            <div class="text-right">
+              <div class="text-4xl font-black text-brand-blue">{{ property?.price | currency:'EUR':'symbol':'1.0-0' }}
+              </div>
+              <p class="text-gray-400 text-sm font-medium mt-1">Impuestos no incluidos</p>
+            </div>
+          </div>
+
+          <!-- Características Rápidas -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-8 border-y border-gray-50 my-8">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-brand-blue/5 rounded-2xl flex items-center justify-center text-brand-blue">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+              </div>
+              <div>
+                <div class="text-lg font-bold text-brand-dark">{{ property?.beds }}</div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Dormitorios</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-brand-blue/5 rounded-2xl flex items-center justify-center text-brand-blue">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <div class="text-lg font-bold text-brand-dark">{{ property?.baths }}</div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Baños</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-brand-blue/5 rounded-2xl flex items-center justify-center text-brand-blue">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+              </div>
+              <div>
+                <div class="text-lg font-bold text-brand-dark">{{ property?.sqft }}</div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Metros²</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-brand-blue/5 rounded-2xl flex items-center justify-center text-brand-blue">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div>
+                <div class="text-lg font-bold text-brand-dark">A+</div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Energía</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Descripción -->
+          <h3 class="text-xl font-bold text-brand-dark mb-4">Sobre esta propiedad</h3>
+          <p class="text-gray-600 leading-relaxed whitespace-pre-line mb-8">
+            {{ property?.description }}
+          </p>
+
+          <!-- Extras/Amenities -->
+          <h3 class="text-xl font-bold text-brand-dark mb-6">Equipamiento y Extras</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-4">
+            <div *ngFor="let feat of property?.features" class="flex items-center gap-3 text-gray-600">
+              <div class="w-2 h-2 bg-brand-blue rounded-full"></div>
+              <span class="font-medium">{{ feat }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lado Derecho: Contacto y Agente -->
+      <div class="space-y-8">
+        <!-- Card de Agente -->
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 sticky top-28">
+          <div class="flex items-center gap-4 mb-6">
+            <img [src]="property?.agent?.image" class="w-16 h-16 rounded-2xl object-cover shadow-md">
+            <div>
+              <h4 class="font-bold text-brand-dark text-lg">{{ property?.agent?.name }}</h4>
+              <p class="text-brand-blue text-sm font-bold">Agente Senior</p>
+            </div>
+          </div>
+
+          <!-- Formulario de Contacto -->
+          <form *ngIf="!isSubmitted" #contactFormRef="ngForm" (ngSubmit)="submitContactForm(contactFormRef)"
+            class="space-y-5" novalidate>
+            <div>
+              <label class="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Tu Nombre</label>
+              <input type="text" name="name" [(ngModel)]="contactData.name" required #nameInput="ngModel"
+                placeholder="Ej: Nombre Ejemplo"
+                [class.border-red-400]="nameInput.invalid && (nameInput.dirty || nameInput.touched || contactFormRef.submitted)"
+                [class.focus:ring-red-100]="nameInput.invalid && (nameInput.dirty || nameInput.touched || contactFormRef.submitted)"
+                [class.focus:border-red-400]="nameInput.invalid && (nameInput.dirty || nameInput.touched || contactFormRef.submitted)"
+                class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all">
+              <div *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched || contactFormRef.submitted)"
+                class="text-red-500 text-xs font-bold mt-1.5 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd" />
+                </svg>
+                El nombre es obligatorio.
+              </div>
+            </div>
+            <div>
+              <label class="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Tu Email</label>
+              <input type="email" name="email" [(ngModel)]="contactData.email" required email #emailInput="ngModel"
+                placeholder="ejemplo@correo.com"
+                [class.border-red-400]="emailInput.invalid && (emailInput.dirty || emailInput.touched || contactFormRef.submitted)"
+                [class.focus:ring-red-100]="emailInput.invalid && (emailInput.dirty || emailInput.touched || contactFormRef.submitted)"
+                [class.focus:border-red-400]="emailInput.invalid && (emailInput.dirty || emailInput.touched || contactFormRef.submitted)"
+                class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all">
+              <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched || contactFormRef.submitted)"
+                class="text-red-500 text-xs font-bold mt-1.5 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span *ngIf="emailInput.errors?.['required']">El correo electrónico es obligatorio.</span>
+                <span *ngIf="emailInput.errors?.['email']">Introduce un correo electrónico válido.</span>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Mensaje</label>
+              <textarea rows="4" name="message" [(ngModel)]="contactData.message" required minlength="10"
+                #messageInput="ngModel" placeholder="Estoy interesado en esta propiedad..."
+                [class.border-red-400]="messageInput.invalid && (messageInput.dirty || messageInput.touched || contactFormRef.submitted)"
+                [class.focus:ring-red-100]="messageInput.invalid && (messageInput.dirty || messageInput.touched || contactFormRef.submitted)"
+                [class.focus:border-red-400]="messageInput.invalid && (messageInput.dirty || messageInput.touched || contactFormRef.submitted)"
+                class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all resize-none"></textarea>
+              <div
+                *ngIf="messageInput.invalid && (messageInput.dirty || messageInput.touched || contactFormRef.submitted)"
+                class="text-red-500 text-xs font-bold mt-1.5 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span *ngIf="messageInput.errors?.['required']">El mensaje es obligatorio.</span>
+                <span *ngIf="messageInput.errors?.['minlength']">El mensaje debe tener al menos 10 caracteres.</span>
+              </div>
+            </div>
+            <button type="submit"
+              class="w-full bg-brand-blue text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-xl shadow-brand-blue/30 hover:bg-brand-dark active:scale-95 transition-all cursor-pointer">
+              Contactar ahora
+            </button>
+          </form>
+
+          <!-- Mensaje de Éxito de Contacto -->
+          <div *ngIf="isSubmitted" class="text-center py-8 px-4 animate-in fade-in zoom-in-95 duration-300">
+            <div
+              class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500 shadow-inner">
+              <svg class="w-10 h-10 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h4 class="font-black text-brand-dark text-2xl mb-3">¡Mensaje Enviado!</h4>
+            <p class="text-gray-500 text-sm leading-relaxed mb-6">
+              Hemos recibido tu solicitud de contacto para esta propiedad. El agente <strong>{{ property?.agent?.name
+                }}</strong> se pondrá en contacto contigo a la brevedad.
+            </p>
+            <button (click)="resetContactForm()"
+              class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold uppercase tracking-wider py-3 rounded-xl transition-all active:scale-98 text-xs cursor-pointer">
+              Enviar otro mensaje
+            </button>
+          </div>
+
+          <!-- Botones de Acción Rápida -->
+          <div class="grid grid-cols-2 gap-4 mt-6">
+            <a [href]="'tel:' + property?.agent?.phone"
+              class="flex items-center justify-center gap-2 py-3 bg-gray-50 rounded-xl text-gray-600 hover:bg-gray-100 transition-all font-bold text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              Llamar
+            </a>
+            <button
+              class="flex items-center justify-center gap-2 py-3 bg-gray-50 rounded-xl text-gray-600 hover:bg-gray-100 transition-all font-bold text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              Guardar
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Lightbox Modal Fullscreen -->
+  <div *ngIf="isLightboxOpen" (click)="closeLightbox()"
+    class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xl flex flex-col items-center justify-center select-none cursor-zoom-out animate-in fade-in duration-300">
+    <!-- Close Button (Glassmorphic capsule) -->
+    <button (click)="closeLightbox()"
+      class="absolute top-6 right-6 px-5 py-2.5 bg-black/40 hover:bg-black/60 text-white/95 rounded-full flex items-center gap-2 border border-white/10 transition-all hover:scale-105 active:scale-95 duration-200 cursor-pointer focus:outline-none backdrop-blur-md text-sm font-bold shadow-lg">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+      Cerrar
+    </button>
+
+    <!-- Main Image Container -->
+    <div class="relative max-w-5xl max-h-[80vh] w-full px-4 flex items-center justify-center overflow-hidden"
+      (click)="$event.stopPropagation()">
+
+      <!-- Large Image inside Modal -->
+      <img [src]="property?.images?.[activeImageIndex]" (click)="toggleZoom($event)" (mousedown)="startDrag($event)"
+        (mousemove)="onDrag($event)" (mouseup)="endDrag()" (mouseleave)="endDrag()"
+        class="max-w-full max-h-[80vh] rounded-3xl shadow-2xl border border-white/10 object-contain transform select-none"
+        [class.transition-transform]="!isDragging" [class.duration-300]="!isDragging" [class.ease-out]="!isDragging"
+        [class.cursor-zoom-in]="zoomLevel === 1" [class.cursor-grab]="zoomLevel > 1 && !isDragging"
+        [class.cursor-grabbing]="zoomLevel > 1 && isDragging" [class.opacity-75]="isAnimating"
+        [style.transform]="'translate3d(' + translateX + 'px, ' + translateY + 'px, 0px) scale(' + zoomLevel + ')'"
+        [class.scale-95]="isAnimating && zoomLevel === 1">
+
+      <!-- Navigation inside Lightbox -->
+      <ng-container *ngIf="(property?.images?.length || 0) > 1 && zoomLevel === 1">
+        <!-- Left Arrow inside Lightbox -->
+        <button (click)="prevImage($event)"
+          class="absolute left-8 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110 active:scale-95 duration-200 cursor-pointer focus:outline-none backdrop-blur-md border border-white/10">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        <!-- Right Arrow inside Lightbox -->
+        <button (click)="nextImage($event)"
+          class="absolute right-8 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110 active:scale-95 duration-200 cursor-pointer focus:outline-none backdrop-blur-md border border-white/10">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </ng-container>
+    </div>
+
+    <!-- Zoom Pill Controllers -->
+    <div
+      class="mt-4 bg-black/40 backdrop-blur-md px-5 py-2 rounded-full border border-white/10 flex items-center gap-4 text-white z-10 shadow-lg"
+      (click)="$event.stopPropagation()">
+      <button (click)="zoomOut($event)"
+        class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-all cursor-pointer focus:outline-none disabled:opacity-40"
+        [disabled]="zoomLevel <= 1" title="Disminuir zoom">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4" />
+        </svg>
+      </button>
+      <span class="text-sm font-bold w-12 text-center">{{ (zoomLevel * 100).toFixed(0) }}%</span>
+      <button (click)="zoomIn($event)"
+        class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-all cursor-pointer focus:outline-none disabled:opacity-40"
+        [disabled]="zoomLevel >= 3" title="Aumentar zoom">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+        </svg>
+      </button>
+      <button (click)="resetZoom($event)"
+        class="text-xs font-bold bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-xl transition-all cursor-pointer focus:outline-none"
+        *ngIf="zoomLevel !== 1">
+        Restablecer
+      </button>
+    </div>
+
+    <!-- Lightbox Counter / Details -->
+    <div
+      class="mt-4 text-center bg-black/30 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/5 text-white/95 shadow-xl"
+      (click)="$event.stopPropagation()">
+      <h4 class="font-bold text-lg tracking-tight">{{ property?.title }}</h4>
+      <p class="text-white/60 text-xs font-semibold mt-1 uppercase tracking-widest">Imagen {{ activeImageIndex + 1 }} de
+        {{ property?.images?.length }}</p>
+    </div>
+  </div>
+</div>

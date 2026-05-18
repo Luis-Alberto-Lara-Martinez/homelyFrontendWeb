@@ -1,10 +1,12 @@
-import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, HostListener, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Properties } from '../../services/properties/properties';
 import { FeaturedPropertiesComponent } from '../../components/featured-properties/featured-properties.component';
 import { CtaBannerComponent } from '../../components/cta-banner/cta-banner.component';
+
+declare let L: any;
 
 @Component({
   selector: 'app-properties-page',
@@ -18,6 +20,18 @@ export class PropertiesComponent implements OnInit {
   isSearchFiltered: boolean = false;
   searchRadiusKm: number = 2;
   isLoading: boolean = true;
+
+  // Variables de ubicación/mapa
+  location: string = '';
+  showMapModal: boolean = false;
+  private map: any;
+  private marker: any;
+  selectedLatitude: number | null = null;
+  selectedLongitude: number | null = null;
+  distance: number = 2;
+  searchQuery: string = '';
+  tempLocationData: any = null;
+  private circle: any;
 
   // Filtros de búsqueda
   filterTransaction: string = '';
@@ -41,19 +55,12 @@ export class PropertiesComponent implements OnInit {
   // Estado para Dropdowns personalizados
   activeDropdown: string | null = null;
 
-  transactionOptions = [
-    { label: 'Cualquiera', value: '' },
-    { label: 'Venta', value: 'venta' },
-    { label: 'Alquiler', value: 'alquiler' }
+  transactionOptions: { label: string, value: string }[] = [
+    { label: 'Cualquiera', value: '' }
   ];
 
-  typeOptions = [
-    { label: 'Todos los tipos', value: '' },
-    { label: 'Residencia', value: 'residencia' },
-    { label: 'Local Comercial', value: 'local' },
-    { label: 'Oficina', value: 'oficina' },
-    { label: 'Garaje', value: 'garaje' },
-    { label: 'Trastero', value: 'trastero' }
+  typeOptions: { label: string, value: string }[] = [
+    { label: 'Todos los tipos', value: '' }
   ];
 
   bedsOptions = [
@@ -61,29 +68,29 @@ export class PropertiesComponent implements OnInit {
     { label: '1 Habitación', value: '1' },
     { label: '2 Habitaciones', value: '2' },
     { label: '3 Habitaciones', value: '3' },
-    { label: '4+ Habitaciones', value: '4' }
+    { label: '4 o más Habitaciones', value: '4' }
   ];
 
   bathsOptions = [
     { label: 'Cualquiera', value: '' },
     { label: '1 Baño', value: '1' },
     { label: '2 Baños', value: '2' },
-    { label: '3+ Baños', value: '3' }
+    { label: '3 o más Baños', value: '3' }
   ];
 
   sortOptions = [
     { label: 'Destacados', value: '' },
     { label: 'Precio: menor a mayor', value: 'price_asc' },
-    { label: 'Precio: mayor a menor', value: 'price_desc' },
-    { label: 'Habitaciones: más a menos', value: 'beds_desc' }
+    { label: 'Precio: mayor a menor', value: 'price_desc' }
   ];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private propertiesService: Properties,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private zone: NgZone
+  ) { }
 
   @HostListener('document:click')
   onDocumentClick() {
@@ -119,9 +126,11 @@ export class PropertiesComponent implements OnInit {
 
   getDisplayValue(filterName: string): string {
     if (filterName === 'transaction') {
-      return this.transactionOptions.find(o => o.value === this.filterTransaction)?.label || 'Cualquiera';
+      const val = this.transactionOptions.find(o => o.value === this.filterTransaction)?.label || 'Cualquiera';
+      return val.charAt(0).toUpperCase() + val.slice(1);
     } else if (filterName === 'type') {
-      return this.typeOptions.find(o => o.value === this.filterType)?.label || 'Todos los tipos';
+      const val = this.typeOptions.find(o => o.value === this.filterType)?.label || 'Todos los tipos';
+      return val.charAt(0).toUpperCase() + val.slice(1);
     } else if (filterName === 'beds') {
       return this.bedsOptions.find(o => o.value === this.filterBeds)?.label || 'Cualquiera';
     } else if (filterName === 'baths') {
@@ -132,18 +141,78 @@ export class PropertiesComponent implements OnInit {
     return '';
   }
 
+  loadPropertyTypes() {
+    this.propertiesService.getAllPropertyTypes().subscribe({
+      next: (types: any[]) => {
+        if (types && Array.isArray(types)) {
+          this.typeOptions = [
+            { label: 'Todos los tipos', value: '' },
+            ...types.map(t => ({
+              label: t.name,
+              value: t.name.toLowerCase()
+            }))
+          ];
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching property types:', err);
+      }
+    });
+  }
+
+  loadPropertyTransactions() {
+    this.propertiesService.getAllPropertyTransactions().subscribe({
+      next: (transactions: any[]) => {
+        if (transactions && Array.isArray(transactions)) {
+          this.transactionOptions = [
+            { label: 'Cualquiera', value: '' },
+            ...transactions.map(t => ({
+              label: t.name,
+              value: t.name.toLowerCase()
+            }))
+          ];
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching property transactions:', err);
+      }
+    });
+  }
+
   ngOnInit(): void {
+    this.loadPropertyTypes();
+    this.loadPropertyTransactions();
     this.route.queryParams.subscribe(params => {
       this.filterTransaction = params['transaction'] || '';
       this.filterType = params['type'] || '';
-      
+
+      const lat = params['lat'];
+      const lng = params['lng'];
+      const rad = params['rad'];
+
+      if (lat && lng) {
+        this.selectedLatitude = Number(lat);
+        this.selectedLongitude = Number(lng);
+        this.distance = Number(rad) || 2;
+        this.location = `${this.selectedLatitude.toFixed(4)}, ${this.selectedLongitude.toFixed(4)}`;
+        this.reverseGeocode(this.selectedLatitude, this.selectedLongitude).then(() => {
+          if (this.tempLocationData) {
+            this.location = this.tempLocationData;
+            this.cdr.detectChanges();
+          }
+        });
+        this.loadPropertiesWithinRadius(this.selectedLatitude, this.selectedLongitude, this.distance);
+      } else {
+        this.loadAllProperties();
+      }
+
       if (this.allProperties.length > 0) {
         this.applyFilters();
       }
     });
 
-    this.loadAllProperties();
-    
     setTimeout(() => {
       const element = document.getElementById('propiedades');
       if (element) {
@@ -214,7 +283,7 @@ export class PropertiesComponent implements OnInit {
       if (this.filterBeds) {
         const beds = Number(prop.residence?.bedrooms || prop.beds || prop.habitaciones) || 0;
         const requiredBeds = Number(this.filterBeds);
-        
+
         if (requiredBeds === 4) {
           if (beds < 4) return false;
         } else {
@@ -308,6 +377,215 @@ export class PropertiesComponent implements OnInit {
     this.filterHasTerrace = false;
     this.filterHasElevator = false;
     this.filterHasAC = false;
-    this.applyFilters();
+
+    // Resetear ubicación y mapa
+    this.location = '';
+    this.selectedLatitude = null;
+    this.selectedLongitude = null;
+    this.distance = 2;
+    this.searchQuery = '';
+    this.tempLocationData = null;
+
+    this.loadAllProperties();
+  }
+
+  openMapModal() {
+    this.showMapModal = true;
+    if (this.location && !this.tempLocationData) {
+      this.searchQuery = this.location;
+    }
+    setTimeout(() => {
+      this.initMap();
+      if (this.searchQuery) {
+        this.searchCity();
+      }
+      setTimeout(() => {
+        if (this.map) {
+          this.map.invalidateSize();
+        }
+      }, 300);
+    }, 100);
+  }
+
+  closeMapModal() {
+    this.showMapModal = false;
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+    }
+    this.marker = null;
+    this.circle = null;
+    this.cdr.detectChanges();
+  }
+
+  initMap() {
+    if (this.map) return;
+
+    // Madrid center as default location
+    const defaultLat = this.selectedLatitude || 40.4168;
+    const defaultLng = this.selectedLongitude || -3.7038;
+    this.map = L.map('map-container').setView([defaultLat, defaultLng], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(this.map);
+
+    if (this.selectedLatitude && this.selectedLongitude) {
+      this.setMarkerAndCircle(this.selectedLatitude, this.selectedLongitude);
+    }
+
+    this.map.on('click', (e: any) => {
+      this.setMarkerAndCircle(e.latlng.lat, e.latlng.lng);
+      this.reverseGeocode(e.latlng.lat, e.latlng.lng);
+    });
+  }
+
+  setMarkerAndCircle(lat: number, lng: number) {
+    this.selectedLatitude = lat;
+    this.selectedLongitude = lng;
+
+    if (this.marker) {
+      this.map.removeLayer(this.marker);
+    }
+    if (this.circle) {
+      this.map.removeLayer(this.circle);
+    }
+
+    const customIcon = L.icon({
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+
+    this.marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
+
+    // Draw circle with brand colors
+    this.circle = L.circle([lat, lng], {
+      color: '#2563EB', // blue-600
+      fillColor: '#3B82F6', // blue-500
+      fillOpacity: 0.15,
+      weight: 2,
+      radius: this.distance * 1000
+    }).addTo(this.map);
+
+    this.map.setView([lat, lng], 13);
+  }
+
+  updateCircle() {
+    if (this.circle && this.marker) {
+      this.circle.setRadius(this.distance * 1000);
+    }
+  }
+
+  async reverseGeocode(lat: number, lon: number) {
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);
+      const data = await response.json();
+
+      if (data && data.address) {
+        const city = data.address.city || data.address.town || data.address.village || data.address.county;
+        const state = data.address.state || data.address.region;
+
+        if (city && state) {
+          this.tempLocationData = `${city}, ${state}`;
+        } else if (city) {
+          this.tempLocationData = city;
+        } else if (state) {
+          this.tempLocationData = state;
+        } else if (data.display_name) {
+          this.tempLocationData = data.display_name.split(',')[0];
+        }
+      } else {
+        this.tempLocationData = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+      }
+    } catch (error) {
+      console.error('Error reverse geocoding:', error);
+      this.tempLocationData = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+    }
+    this.cdr.detectChanges();
+  }
+
+  async searchCity() {
+    if (!this.searchQuery) return;
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.searchQuery)}&limit=1`);
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        this.setMarkerAndCircle(lat, lon);
+        this.reverseGeocode(lat, lon);
+      }
+    } catch (err) {
+      console.error('Error searching city:', err);
+    }
+  }
+
+  useCurrentLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          this.setMarkerAndCircle(lat, lon);
+          this.reverseGeocode(lat, lon);
+        },
+        (error) => {
+          console.error('Error obtaining location', error);
+          alert('No se ha podido acceder a la ubicación. Revisa los permisos del navegador.');
+        }
+      );
+    } else {
+      alert('Tu navegador no soporta geolocalización.');
+    }
+  }
+
+  applyLocation() {
+    if (this.tempLocationData) {
+      this.location = this.tempLocationData;
+    }
+    this.closeMapModal();
+  }
+
+  applyAndSearch() {
+    this.applyLocation();
+    if (this.selectedLatitude !== null && this.selectedLongitude !== null) {
+      this.loadPropertiesWithinRadius(this.selectedLatitude, this.selectedLongitude, this.distance);
+    }
+  }
+
+  loadPropertiesWithinRadius(lat: number, lng: number, rad: number) {
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    this.propertiesService.getPropertiesWithinRadius(lat, lng, rad).subscribe({
+      next: (data: any) => {
+        let list: any[] = [];
+        if (Array.isArray(data)) {
+          list = data;
+        } else if (data && Array.isArray(data.data)) {
+          list = data.data;
+        } else if (data && Array.isArray(data.properties)) {
+          list = data.properties;
+        } else if (data && Array.isArray(data.content)) {
+          list = data.content;
+        }
+        this.allProperties = list;
+        this.applyFilters();
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Error loading properties within radius:', err);
+        this.allProperties = [];
+        this.propertiesList = [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }
