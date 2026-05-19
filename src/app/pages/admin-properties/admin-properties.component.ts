@@ -36,7 +36,7 @@ export class AdminPropertiesComponent implements OnInit {
   constructor(
     private propertiesService: Properties,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadProperties();
@@ -72,23 +72,23 @@ export class AdminPropertiesComponent implements OnInit {
 
   updatePagination() {
     let filtered = this.properties;
-    
+
     if (this.searchQuery.trim()) {
       const q = this.searchQuery.toLowerCase();
-      filtered = this.properties.filter(p => 
-        (p.title && p.title.toLowerCase().includes(q)) || 
+      filtered = this.properties.filter(p =>
+        (p.title && p.title.toLowerCase().includes(q)) ||
         (p.location && p.location.toLowerCase().includes(q)) ||
         (p.address && typeof p.address === 'string' && p.address.toLowerCase().includes(q))
       );
     }
-    
+
     this.totalElements = filtered.length;
     this.totalPages = Math.ceil(this.totalElements / this.pageSize);
-    
+
     if (this.currentPage > this.totalPages) {
       this.currentPage = this.totalPages > 0 ? this.totalPages : 1;
     }
-    
+
     const startIndex = (this.currentPage - 1) * this.pageSize;
     this.filteredProperties = filtered.slice(startIndex, startIndex + this.pageSize);
   }
@@ -124,7 +124,7 @@ export class AdminPropertiesComponent implements OnInit {
 
   confirmDelete() {
     if (!this.propertyToDelete) return;
-    
+
     this.isDeleting = true;
     this.propertiesService.deleteProperty(this.propertyToDelete.id).subscribe({
       next: () => {
@@ -152,15 +152,30 @@ export class AdminPropertiesComponent implements OnInit {
     }, 4000);
   }
 
+  formatImageUrl(url: string): string {
+    if (!url) return url;
+    const targetBase = 'https://res.cloudinary.com/homely-cloudinary/image/upload/';
+    if (url.startsWith(targetBase) && !url.includes('homely/properties/')) {
+      const pathPart = url.substring(targetBase.length);
+      const match = pathPart.match(/^(v\d+\/)?(.+)$/);
+      if (match) {
+        const version = match[1] || '';
+        const filename = match[2];
+        return `${targetBase}${version}homely/properties/${filename}`;
+      }
+    }
+    return url;
+  }
+
   getFirstImage(property: any): string {
     if (property.images && Array.isArray(property.images) && property.images.length > 0) {
       let img = property.images[0];
       if (typeof img === 'object' && img.imageUrl) {
-        return img.imageUrl;
+        return this.formatImageUrl(img.imageUrl);
       }
-      return img;
+      return this.formatImageUrl(img);
     }
-    if (property.imageUrl) return property.imageUrl;
+    if (property.imageUrl) return this.formatImageUrl(property.imageUrl);
     return '/assets/img/house-placeholder.jpg';
   }
 
