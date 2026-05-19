@@ -144,7 +144,7 @@ export class Users {
   getAllStatuses(): Observable<any[]> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any[]>(`${environment.backendUrl}/admin/user/statuses`, { headers });
+    return this.http.get<any[]>(`${environment.backendUrl}/admin/user/statuses/user/statuses`, { headers });
   }
 
   updateUserRole(userEmail: string, role: string): Observable<any> {

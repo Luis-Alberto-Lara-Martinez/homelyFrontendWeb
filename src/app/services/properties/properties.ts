@@ -14,19 +14,20 @@ export class Properties {
 
   constructor(private http: HttpClient) { }
 
-  // Obtener todas las propiedades (asume GET /api/properties/)
-  getAllProperties(): Observable<any[]> {
+  // Obtener todas las propiedades (POST /admin/properties)
+  getAllProperties(): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any[]>(`${this.baseUrl}/`, { headers }).pipe(
-      tap((results: any[]) => {
-        console.log('Properties Service - Guardando listado completo:', results);
-        this.latestResults = results;
+    return this.http.post<any>(`${environment.backendUrl}/admin/properties`, { page: 0, size: 9999 }, { headers }).pipe(
+      tap((results: any) => {
+        const list = (results && Array.isArray(results.content)) ? results.content : results;
+        console.log('Properties Service - Guardando listado completo:', list);
+        this.latestResults = list;
       })
     );
   }
 
-  // Obtener propiedades dentro de un radio (POST /api/property/all)
+  // Obtener propiedades dentro de un radio (POST /api/properties)
   getPropertiesWithinRadius(latitude: number, longitude: number, radiusKm: number): Observable<any[]> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -35,7 +36,7 @@ export class Properties {
       longitude: longitude,
       radiusKm: radiusKm
     };
-    return this.http.post<any[]>(`${environment.backendUrl}/api/property/all`, body, { headers }).pipe(
+    return this.http.post<any[]>(`${this.baseUrl}`, body, { headers }).pipe(
       tap((results: any[]) => {
         console.log('Properties Service - Guardando búsqueda de radio:', results);
         this.latestResults = results;
