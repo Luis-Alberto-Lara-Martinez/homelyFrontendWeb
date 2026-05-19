@@ -2,6 +2,8 @@ import { Component, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Properties } from '../../services/properties/properties';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-ventas',
@@ -10,8 +12,11 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './ventas.component.html'
 })
 export class VentasComponent implements OnDestroy {
+  private propertiesService = inject(Properties);
+  private router = inject(Router);
+
   currentStep: number = 1;
-  totalSteps: number = 7;
+  totalSteps: number = 4;
 
   // Selected Images
   selectedImages: { file: File, previewUrl: string }[] = [];
@@ -61,20 +66,17 @@ export class VentasComponent implements OnDestroy {
   ];
 
   getStepTitle(): string {
-    switch(this.currentStep) {
+    switch (this.currentStep) {
       case 1: return 'Datos básicos del anuncio';
       case 2: return 'Ubicación del inmueble';
       case 3: return 'Características principales';
-      case 4: return 'Título y descripción';
-      case 5: return 'Establecer precio';
-      case 6: return 'Multimedia y fotografías';
-      case 7: return 'Contacto y confirmación';
+      case 4: return 'Detalles comerciales del anuncio';
       default: return '';
     }
   }
 
   isStepValid(step: number): boolean {
-    switch(step) {
+    switch (step) {
       case 1:
         return !!this.formData.tipoVivienda && !!this.formData.operacion;
       case 2:
@@ -82,13 +84,10 @@ export class VentasComponent implements OnDestroy {
       case 3:
         return !!this.formData.metros && Number(this.formData.metros) > 0;
       case 4:
-        return !!this.formData.titulo?.trim() && !!this.formData.descripcion?.trim();
-      case 5:
-        return !!this.formData.precio && Number(this.formData.precio) > 0;
-      case 6:
-        return true; // Multimedia es opcional
-      case 7:
-        return !!this.formData.telefono?.trim() && this.formData.telefono.replace(/\s+/g, '').length >= 9;
+        return !!this.formData.titulo?.trim() &&
+          !!this.formData.descripcion?.trim() &&
+          !!this.formData.precio &&
+          Number(this.formData.precio) > 0;
       default:
         return true;
     }
@@ -187,7 +186,7 @@ export class VentasComponent implements OnDestroy {
     const timeoutId = setTimeout(() => controller.abort(), 3500); // Timeout rápido de 3.5 segundos
 
     try {
-      const response = await fetch(url, { 
+      const response = await fetch(url, {
         signal: controller.signal,
         headers: {
           'Accept-Language': 'es' // Forzar idioma español
@@ -206,7 +205,7 @@ export class VentasComponent implements OnDestroy {
 
   get mapUrl(): SafeResourceUrl | string {
     if (this.formData.latitud && this.formData.longitud) {
-      const url = `https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(this.formData.longitud)-0.005},${parseFloat(this.formData.latitud)-0.005},${parseFloat(this.formData.longitud)+0.005},${parseFloat(this.formData.latitud)+0.005}&layer=mapnik&marker=${this.formData.latitud},${this.formData.longitud}`;
+      const url = `https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(this.formData.longitud) - 0.005},${parseFloat(this.formData.latitud) - 0.005},${parseFloat(this.formData.longitud) + 0.005},${parseFloat(this.formData.latitud) + 0.005}&layer=mapnik&marker=${this.formData.latitud},${this.formData.longitud}`;
       return this.sanitizer.bypassSecurityTrustResourceUrl(url);
     }
     return '';
@@ -256,4 +255,87 @@ export class VentasComponent implements OnDestroy {
     }
     this.cdr.detectChanges();
   }
+
+  isSubmitting = false;
+  submitError = '';
+
+  publicarAnuncio() {
+    if (!this.isStepValid(this.currentStep)) return;
+
+    this.isSubmitting = true;
+    this.submitError = '';
+    this.cdr.detectChanges();
+
+    const addressDto = {
+      street: this.formData.direccion,
+      number: '',
+      floor: '',
+      door: '',
+      postalCode: this.formData.codigoPostal,
+      city: this.formData.ciudad,
+      province: this.formData.ciudad,
+      country: 'España',
+      latitude: parseFloat(this.formData.latitud),
+      longitude: parseFloat(this.formData.longitud)
+    };
+
+    const residenceDto = (this.formData.tipoVivienda === 'casa' || this.formData.tipoVivienda === 'apartamento') ? {
+      bedrooms: this.formData.habitaciones,
+      bathrooms: this.formData.banos,
+      conservation: 'Bueno',
+      orientation: 'Norte'
+    } : null;
+
+    const extrasList: any[] = [];
+    if (this.formData.tipoVivienda === 'casa' || this.formData.tipoVivienda === 'apartamento') {
+      if (this.formData.extrasCasa.garaje) extrasList.push({ id: null, name: 'garaje' });
+      if (this.formData.extrasCasa.piscina) extrasList.push({ id: null, name: 'piscina' });
+      if (this.formData.extrasCasa.ascensor) extrasList.push({ id: null, name: 'ascensor' });
+      if (this.formData.extrasCasa.terraza) extrasList.push({ id: null, name: 'terraza' });
+    } else if (this.formData.tipoVivienda === 'garaje') {
+      if (this.formData.extrasGaraje.cubierto) extrasList.push({ id: null, name: 'cubierto' });
+      if (this.formData.extrasGaraje.seguridad24h) extrasList.push({ id: null, name: 'seguridad24h' });
+      if (this.formData.extrasGaraje.puertaAutomatica) extrasList.push({ id: null, name: 'puertaAutomatica' });
+    } else if (this.formData.tipoVivienda === 'trastero') {
+      if (this.formData.extrasTrastero.acceso24h) extrasList.push({ id: null, name: 'acceso24h' });
+      if (this.formData.extrasTrastero.seguridad) extrasList.push({ id: null, name: 'seguridad' });
+      if (this.formData.extrasTrastero.estanterias) extrasList.push({ id: null, name: 'estanterias' });
+    }
+
+    const payload = {
+      type: this.formData.tipoVivienda,
+      status: 'Disponible',
+      transaction: this.formData.operacion,
+      title: this.formData.titulo,
+      description: this.formData.descripcion,
+      surface: parseInt(this.formData.metros),
+      price: parseFloat(this.formData.precio),
+      updatedBy: null,
+      images: [],
+      extras: extrasList,
+      address: addressDto,
+      residence: residenceDto,
+      energyCertificate: {
+        hasCertificate: false,
+        consumptionScale: 'G',
+        consumptionValue: 0,
+        emissionsScale: 'G',
+        emissionsValue: 0
+      }
+    };
+
+    this.propertiesService.createProperty(payload).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.router.navigate(['/admin/properties']);
+      },
+      error: (err) => {
+        console.error('Error al registrar la propiedad:', err);
+        this.submitError = 'Hubo un error al registrar la propiedad. Por favor, comprueba que el backend esté levantado y tenga el endpoint configurado.';
+        this.isSubmitting = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
 }
+

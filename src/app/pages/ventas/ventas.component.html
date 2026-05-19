@@ -37,7 +37,7 @@
           <span class="text-xs font-semibold text-gray-400">{{ ((currentStep / totalSteps) * 100) | number:'1.0-0' }}% completado</span>
         </div>
         <div class="flex gap-2 h-2.5">
-          <div *ngFor="let step of [1,2,3,4,5,6,7]" 
+          <div *ngFor="let step of [1,2,3,4]" 
                class="flex-1 rounded-full transition-all duration-500 ease-out"
                [ngClass]="currentStep >= step ? 'bg-gradient-brand shadow-[0_0_12px_rgba(75,123,245,0.35)]' : 'bg-gray-200'">
           </div>
@@ -319,13 +319,14 @@
           </div>
         </div>
 
-        <!-- Paso 4: Título y Descripción -->
+        <!-- Paso 4: Título, descripción, precio e imágenes -->
         <div *ngIf="currentStep === 4" class="animate-fade-in space-y-8">
           <div>
-            <h2 class="text-2xl font-bold text-brand-dark mb-1">Título y descripción de la ficha</h2>
-            <p class="text-gray-500 text-sm mb-6">Introduce el título comercial y la descripción detallada para la publicación del inmueble.</p>
+            <h2 class="text-2xl font-bold text-brand-dark mb-1">Detalles comerciales del anuncio</h2>
+            <p class="text-gray-500 text-sm mb-6">Completa la información pública, establece el precio de salida y añade fotografías.</p>
             
             <div class="space-y-6">
+              <!-- Título -->
               <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Título de la publicación</label>
                 <div class="relative">
@@ -338,130 +339,94 @@
                 <p class="text-xs text-gray-400 mt-2 font-medium">El título resumirá lo más destacado del inmueble en el catálogo público.</p>
               </div>
 
+              <!-- Descripción -->
               <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Descripción del inmueble</label>
-                <textarea [(ngModel)]="formData.descripcion" rows="6" placeholder="Describe la distribución, estado, luminosidad, servicios de la zona, etc..."
+                <textarea [(ngModel)]="formData.descripcion" rows="4" placeholder="Describe la distribución, estado, luminosidad, servicios de la zona, etc..."
                           class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl px-4 py-4 text-gray-800 font-medium outline-none focus:bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all duration-200 resize-none leading-relaxed"></textarea>
                 <p class="text-xs text-gray-400 mt-2 font-medium">Explica detalladamente la distribución física, calidades y condiciones especiales de la propiedad.</p>
               </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Paso 5: Establecer Precio -->
-        <div *ngIf="currentStep === 5" class="animate-fade-in space-y-8">
-          <div>
-            <h2 class="text-2xl font-bold text-brand-dark mb-1">Precio comercial de salida</h2>
-            <p class="text-gray-500 text-sm mb-6">Establece el importe de cotización inicial para el inmueble en el catálogo.</p>
-            
-            <div class="space-y-6">
-              <div class="bg-brand-blue/5 border border-brand-blue/10 rounded-3xl p-8 max-w-xl mx-auto shadow-sm">
+              <!-- Precio (Unificado) -->
+              <div class="bg-brand-blue/5 border border-brand-blue/10 rounded-3xl p-6 shadow-sm">
                 <label class="block text-xs font-bold uppercase tracking-wider text-brand-blue mb-3 text-center">Precio de {{formData.operacion === 'venta' ? 'venta final' : 'alquiler mensual'}}</label>
                 <div class="relative max-w-xs mx-auto">
-                  <span class="absolute left-5 top-1/2 -translate-y-1/2 text-brand-blue font-black text-3xl select-none">€</span>
+                  <span class="absolute left-5 top-1/2 -translate-y-1/2 text-brand-blue font-black text-2xl select-none">€</span>
                   <input type="number" min="0" [(ngModel)]="formData.precio" placeholder="250000"
-                         class="w-full bg-white border-2 border-brand-blue/20 rounded-2xl pl-12 pr-4 py-5 text-brand-blue outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all font-bold text-3xl tracking-tight text-center shadow-inner">
+                         class="w-full bg-white border-2 border-brand-blue/20 rounded-2xl pl-12 pr-4 py-4 text-brand-blue outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all font-bold text-2xl tracking-tight text-center shadow-inner">
                 </div>
-                <p class="text-xs text-gray-400 mt-4 text-center font-medium leading-relaxed">
-                  Este valor será tomado como referencia para las búsquedas filtradas y el cálculo automatizado de viabilidad financiera.
-                </p>
               </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Paso 6: Multimedia (Fotos) -->
-        <div *ngIf="currentStep === 6" class="animate-fade-in space-y-8">
-          <div>
-            <h2 class="text-2xl font-bold text-brand-dark mb-1">Carga de archivos fotográficos</h2>
-            <p class="text-gray-500 text-sm mb-6">Añade imágenes de alta calidad que representen con fidelidad el estado actual de las estancias.</p>
-            
-            <!-- Hidden File Input -->
-            <input type="file" #fileInput class="hidden" multiple accept="image/*" (change)="onFilesSelected($event)">
-            
-            <!-- Drag and Drop Area -->
-            <div (click)="fileInput.click()"
-                 (dragover)="onDragOver($event)"
-                 (drop)="onDrop($event)"
-                 class="border-2 border-dashed border-brand-blue/20 bg-brand-blue/5 hover:bg-brand-blue/10 rounded-3xl p-12 flex flex-col items-center justify-center text-center hover:border-brand-blue/50 transition-all duration-300 cursor-pointer group shadow-inner">
-              <div class="w-20 h-20 bg-white text-brand-blue rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-gray-100 group-hover:scale-110 transition-transform duration-300">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-              </div>
-              <h3 class="text-xl font-bold text-gray-800 mb-1.5">Adjuntar imágenes del inmueble</h3>
-              <p class="text-gray-400 text-sm mb-6 font-medium">Arrastra los archivos fotográficos aquí o haz clic para buscarlos en el equipo</p>
-              <span class="bg-white border border-gray-200 text-gray-700 px-8 py-3.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200 group-hover:-translate-y-0.5 transform active:scale-95">
-                Seleccionar archivos
-              </span>
-              <p class="text-xs text-gray-400 mt-6 font-semibold">Formatos permitidos: JPG, PNG • Máx: 10MB por archivo</p>
-            </div>
-
-            <!-- Preview Grid -->
-            <div *ngIf="selectedImages.length > 0" class="mt-8">
-              <h4 class="text-sm font-bold text-brand-dark uppercase tracking-wider mb-4 flex items-center gap-2">
-                <span>Imágenes seleccionadas</span>
-                <span class="bg-brand-blue/10 text-brand-blue px-2.5 py-0.5 rounded-full text-xs font-black">{{selectedImages.length}}</span>
-              </h4>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 animate-fade-in">
-                <div *ngFor="let img of selectedImages; let i = index" 
-                     class="group relative aspect-square rounded-2xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                  <img [src]="img.previewUrl" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="Vista previa">
-                  
-                  <!-- Trash / Delete Floating Overlay -->
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-3.5">
-                    <span class="text-white text-xs font-semibold truncate max-w-[100px]">{{img.file.name}}</span>
-                    <button type="button" (click)="removeImage(i); $event.stopPropagation()"
-                            class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center shadow-lg hover:bg-rose-700 active:scale-90 transition-all cursor-pointer">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                      </svg>
-                    </button>
+              <!-- Fotos (Unificado) -->
+              <div class="pt-4 border-t border-gray-100">
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-4">Archivos fotográficos</label>
+                
+                <!-- Hidden File Input -->
+                <input type="file" #fileInput class="hidden" multiple accept="image/*" (change)="onFilesSelected($event)">
+                
+                <!-- Drag and Drop Area -->
+                <div (click)="fileInput.click()"
+                     (dragover)="onDragOver($event)"
+                     (drop)="onDrop($event)"
+                     class="border-2 border-dashed border-brand-blue/20 bg-brand-blue/5 hover:bg-brand-blue/10 rounded-3xl p-8 flex flex-col items-center justify-center text-center hover:border-brand-blue/50 transition-all duration-300 cursor-pointer group shadow-inner">
+                  <div class="w-16 h-16 bg-white text-brand-blue rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-gray-100 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
                   </div>
-                  
-                  <!-- Fallback static delete button for mobile/touch screens -->
-                  <button type="button" (click)="removeImage(i); $event.stopPropagation()"
-                          class="sm:hidden absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm text-white flex items-center justify-center hover:bg-rose-600 active:scale-90 transition-all">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Paso 7: Contacto y Confirmación -->
-        <div *ngIf="currentStep === 7" class="animate-fade-in space-y-8">
-          <div>
-            <h2 class="text-2xl font-bold text-brand-dark mb-1">Contacto y confirmación de registro</h2>
-            <p class="text-gray-500 text-sm mb-6">Asigna el número telefónico para la recepción directa de solicitudes de visita o información.</p>
-            
-            <div class="space-y-6 max-w-md mx-auto bg-gray-50/50 border border-gray-100 p-8 rounded-3xl shadow-inner">
-              <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Teléfono de contacto asignado</label>
-                <div class="relative">
-                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 flex items-center gap-1">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                    <span class="text-xs font-bold border-r border-gray-200 pr-2">+34</span>
+                  <h3 class="text-lg font-bold text-gray-800 mb-1">Adjuntar imágenes del inmueble</h3>
+                  <p class="text-gray-400 text-xs mb-4 font-medium">Arrastra los archivos aquí o haz clic para buscarlos</p>
+                  <span class="bg-white border border-gray-200 text-gray-700 px-6 py-2 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200 group-hover:-translate-y-0.5 transform active:scale-95 text-sm">
+                    Seleccionar archivos
                   </span>
-                  <input type="tel" [(ngModel)]="formData.telefono" placeholder="600 000 000"
-                         class="w-full bg-white border border-gray-200 rounded-2xl pl-20 pr-4 py-4 text-gray-800 font-extrabold text-lg outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 transition-all tracking-wide">
                 </div>
-                <p class="text-xs text-gray-400 mt-3 font-medium leading-relaxed">
-                  Este número será publicado en la ficha de catálogo para centralizar el flujo de llamadas de los clientes y leads de la plataforma.
-                </p>
+
+                <!-- Preview Grid -->
+                <div *ngIf="selectedImages.length > 0" class="mt-6">
+                  <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <span>Imágenes seleccionadas</span>
+                    <span class="bg-brand-blue/10 text-brand-blue px-2.5 py-0.5 rounded-full text-xs font-black">{{selectedImages.length}}</span>
+                  </h4>
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 animate-fade-in">
+                    <div *ngFor="let img of selectedImages; let i = index" 
+                         class="group relative aspect-square rounded-2xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                      <img [src]="img.previewUrl" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="Vista previa">
+                      
+                      <!-- Trash / Delete Floating Overlay -->
+                      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-3.5">
+                        <span class="text-white text-xs font-semibold truncate max-w-[100px]">{{img.file.name}}</span>
+                        <button type="button" (click)="removeImage(i); $event.stopPropagation()"
+                                class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center shadow-lg hover:bg-rose-700 active:scale-90 transition-all cursor-pointer">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
+                        </button>
+                      </div>
+                      
+                      <button type="button" (click)="removeImage(i); $event.stopPropagation()"
+                              class="sm:hidden absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm text-white flex items-center justify-center hover:bg-rose-600 active:scale-90 transition-all">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Error Message -->
+      <div *ngIf="submitError" class="mx-8 mb-4 text-rose-500 text-sm font-semibold text-center flex items-center justify-center gap-2 bg-rose-50 border border-rose-100 p-3.5 rounded-xl">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        <span>{{ submitError }}</span>
+      </div>
+
       <!-- Navigation Footer -->
       <div class="p-8 border-t border-gray-100 bg-gray-50/50 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
         <button (click)="prevStep()"
                 type="button"
-                [class.invisible]="currentStep === 1"
+                [class.invisible]="currentStep === 1 || isSubmitting"
                 class="w-full sm:w-auto px-8 py-3.5 rounded-2xl font-bold text-gray-500 hover:bg-gray-200/50 hover:text-slate-800 transition-all active:scale-95 cursor-pointer">
           Volver atrás
         </button>
@@ -475,11 +440,13 @@
         </button>
 
         <button *ngIf="currentStep === totalSteps"
+                (click)="publicarAnuncio()"
                 type="button"
-                [disabled]="!isStepValid(currentStep)"
+                [disabled]="!isStepValid(currentStep) || isSubmitting"
                 class="w-full sm:w-auto px-12 py-4 rounded-2xl font-black text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/35 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none">
-          <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-          Publicar Anuncio
+          <svg *ngIf="isSubmitting" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          <svg *ngIf="!isSubmitting" class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          {{ isSubmitting ? 'Publicando...' : 'Publicar Anuncio' }}
         </button>
       </div>
     </div>
